@@ -290,7 +290,7 @@
                 <div class="card p-5 bg-white border-emerald-100 text-center text-center text-center text-center text-center">
                     <h3 class="text-sm font-black text-emerald-600 uppercase tracking-widest mb-4 italic text-center text-center text-center text-center text-center text-center text-center text-center text-center">결과 필터링</h3>
                     <div class="grid grid-cols-2 gap-4 text-center text-center text-center text-center text-center">
-                        <div class="space-y-1 text-center text-center text-center text-center text-center text-center text-center">
+                        <div class="space-y-1 text-center text-center text-center text-center text-center text-center text-center text-center">
                             <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center text-center text-center text-center text-center text-center text-center text-center">최소 CAGR (%)</label>
                             <input type="number" id="filterCAGR" value="30" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist text-center text-center text-center text-center text-center text-center text-center text-center">
                         </div>
@@ -327,7 +327,7 @@
                         <span id="optStatus" class="text-slate-400 text-[9px] font-normal uppercase mt-0.5 text-center text-center text-center text-center text-center text-center text-center">Idle</span>
                     </div>
                     <div class="flex flex-col md:flex-row items-center gap-4 text-center text-center text-center text-center text-center text-center text-center">
-                        <div class="flex items-center gap-2 text-center text-center text-center text-center text-center text-center text-center">
+                        <div class="flex items-center gap-2 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                             <label class="text-[9px] font-bold uppercase text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">1차 정렬 (Top 30):</label>
                             <select id="optSortCriteria" onchange="renderOptimizeTable()" class="bg-slate-700 text-white text-[10px] font-bold p-1 rounded outline-none border border-slate-600 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                                 <option value="calmar" selected>Calmar Ratio</option>
@@ -338,7 +338,7 @@
                                 <option value="pain">Pain Index (낮은순)</option>
                             </select>
                         </div>
-                        <div class="flex items-center gap-2 text-center text-center text-center text-center text-center text-center text-center">
+                        <div class="flex items-center gap-2 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                             <label class="text-[9px] font-bold uppercase text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">2차 정렬:</label>
                             <select id="optSortCriteria2" onchange="renderOptimizeTable()" class="bg-slate-700 text-blue-300 text-[10px] font-bold p-1 rounded outline-none border border-blue-600/50 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                                 <option value="none">없음</option>
@@ -821,7 +821,19 @@
             optimizationResults.sort(getCompareFunc(criteria1));
             let finalSelection = optimizationResults.slice(0, 30); if (criteria2 !== 'none') { finalSelection.sort(getCompareFunc(criteria2)); }
             if (optimizationResults.length === 0) { optBody.innerHTML = `<tr><td colspan="12" class="py-20 text-red-400 italic font-bold text-center">조건을 만족하는 결과가 없습니다.</td></tr>`; return; }
-            optBody.innerHTML = finalSelection.map((r, idx) => `
+            optBody.innerHTML = finalSelection.map((r, idx) => {
+                // [핵심 수정] 저장에 필요한 필수 파라미터만 추출하여 경량화
+                const essentialParams = { 
+                    N: r.N, 
+                    BuyP: r.BuyP, 
+                    SellP: r.SellP, 
+                    D: r.D, 
+                    startDate: r.startDate, 
+                    endDate: r.endDate 
+                };
+                const paramStr = JSON.stringify(essentialParams).replace(/"/g, '&quot;');
+                
+                return `
                 <tr class="clickable-row border-b text-center">
                     <td class="px-4 py-3 font-bold" onclick="window.applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})">${idx + 1}</td>
                     <td class="px-2 py-3 font-semibold text-center text-center">${r.N}</td>
@@ -836,9 +848,9 @@
                     <td class="px-4 py-3 bg-red-50 font-black text-red-700 border-x border-red-100 text-center text-center text-center text-center text-center text-center text-center text-center">${r.pf.toFixed(2)}</td>
                     <td class="px-4 py-2 flex items-center justify-center gap-1.5 text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                         <button onclick="window.applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center text-center text-center text-center text-center">적용</button>
-                        <button onclick="window.openPresetModal(${JSON.stringify(r).replace(/"/g, '&quot;')})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center text-center text-center text-center text-center" title="프리셋으로 저장">★</button>
+                        <button onclick="window.openPresetModal(${paramStr})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center text-center text-center text-center text-center" title="프리셋으로 저장">★</button>
                     </td>
-                </tr>`).join('');
+                </tr>`}).join('');
         }
 
         window.applyParams = function(n, buy, sell, d) {
