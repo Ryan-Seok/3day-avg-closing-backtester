@@ -538,17 +538,19 @@
             document.getElementById('modalOverlay').style.display = 'none';
         };
 
+        // [수정] 적용 버튼 시 이동만 하고 자동 실행 중단
         window.applyPresetToUI = function(p) {
-            document.getElementById('divN').value = p.N;
-            document.getElementById('paramBuyP').value = p.BuyP;
-            document.getElementById('paramSellP').value = p.SellP;
-            document.getElementById('maxD').value = p.D;
+            document.getElementById('divN').value = p.N || p.divN || 5;
+            document.getElementById('paramBuyP').value = p.BuyP || p.paramBuyP || 1;
+            document.getElementById('paramSellP').value = p.SellP || p.paramSellP || 1;
+            document.getElementById('maxD').value = p.D || p.maxD || 8;
             if (p.seed) document.getElementById('seed').value = p.seed;
             if (p.fee) document.getElementById('fee').value = p.fee;
             if (p.startDate) document.getElementById('startDate').value = p.startDate;
             if (p.endDate) document.getElementById('endDate').value = p.endDate;
+            
             switchTab('backtest');
-            window.runBacktest();
+            // window.runBacktest(); // 자동 실행 주석 처리
         };
 
         window.saveAllInputs = saveAllInputs;
@@ -782,7 +784,6 @@
             const filters = { cagr: parseFloat(document.getElementById('filterCAGR').value), mdd: parseFloat(document.getElementById('filterMDD').value), calmar: parseFloat(document.getElementById('filterCalmar').value), pain: parseFloat(document.getElementById('filterPain').value) };
             const ranges = { n: [parseInt(document.getElementById('optNMin').value), parseInt(document.getElementById('optNMax').value)], buy: [parseFloat(document.getElementById('optBuyMin').value), parseFloat(document.getElementById('optBuyMax').value)], sell: [parseFloat(document.getElementById('optSellMin').value), parseFloat(document.getElementById('optSellMax').value)], d: [parseInt(document.getElementById('optDMin').value), parseInt(document.getElementById('optDMax').value)] };
             
-            // [업데이트] 총조합수 계산
             const nCount = ranges.n[1] - ranges.n[0] + 1;
             const buyCount = Math.round((ranges.buy[1] - ranges.buy[0]) * 10) + 1;
             const sellCount = Math.round((ranges.sell[1] - ranges.sell[0]) * 10) + 1;
@@ -795,7 +796,6 @@
             for (let i = 0; i < totalIter; i += CHUNK_SIZE) {
                 const currentEnd = Math.min(i + CHUNK_SIZE, totalIter), percent = Math.round((currentEnd / totalIter) * 100);
                 progressBar.style.width = `${percent}%`; progressText.innerText = `연산 진행률: ${percent}%`;
-                // [요청 반영] 문구 형식 변경: 진행중갯수/설정한반복횟수 (총조합수: xxxx)
                 progressDetail.innerText = `${currentEnd} / ${totalIter} (총조합수: ${totalCombinations.toLocaleString()})`;
                 
                 await new Promise(resolve => setTimeout(resolve, 0));
@@ -843,12 +843,16 @@
                 </tr>`).join('');
         }
 
+        // 최적화 버튼에서 직접 호출하는 경우를 위한 함수
         function applyParams(n, buy, sell, d) {
-            document.getElementById('divN').value = n; document.getElementById('paramBuyP').value = buy;
-            document.getElementById('paramSellP').value = sell; document.getElementById('maxD').value = d;
+            document.getElementById('divN').value = n; 
+            document.getElementById('paramBuyP').value = buy;
+            document.getElementById('paramSellP').value = sell; 
+            document.getElementById('maxD').value = d;
             document.getElementById('startDate').value = document.getElementById('optStartDate').value;
             document.getElementById('endDate').value = document.getElementById('optEndDate').value;
-            switchTab('backtest'); window.runBacktest();
+            switchTab('backtest');
+            // window.runBacktest(); // 자동 실행 중단
         }
     </script>
 </body>
