@@ -38,7 +38,7 @@
             <p class="text-xs text-slate-500 mb-4 text-center">저장할 프리셋 이름을 입력하세요.</p>
             <input type="text" id="presetNameInput" class="w-full p-2 border border-slate-300 rounded mb-6 outline-none focus:border-blue-500 text-center" placeholder="">
             <div class="flex gap-2">
-                <button onclick="closePresetModal()" class="flex-1 py-2 bg-slate-100 rounded font-bold text-slate-600 hover:bg-slate-200">취소</button>
+                <button onclick="window.closePresetModal()" class="flex-1 py-2 bg-slate-100 rounded font-bold text-slate-600 hover:bg-slate-200">취소</button>
                 <button id="confirmSavePreset" class="flex-1 py-2 bg-blue-600 rounded font-bold text-white hover:bg-blue-700">저장</button>
             </div>
         </div>
@@ -54,8 +54,8 @@
                 </div>
             </div>
             <div class="flex gap-6 text-sm font-medium text-slate-500">
-                <button onclick="switchTab('backtest')" id="btnTabBacktest" class="pb-2 tab-active transition-colors">전략 백테스트</button>
-                <button onclick="switchTab('optimize')" id="btnTabOptimize" class="pb-2 hover:text-blue-500 transition-colors">파라미터 최적화</button>
+                <button onclick="window.switchTab('backtest')" id="btnTabBacktest" class="pb-2 tab-active transition-colors">전략 백테스트</button>
+                <button onclick="window.switchTab('optimize')" id="btnTabOptimize" class="pb-2 hover:text-blue-500 transition-colors">파라미터 최적화</button>
             </div>
         </div>
 
@@ -66,9 +66,9 @@
                 <select id="presetSelect" class="bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold outline-none focus:border-blue-500 min-w-[180px]">
                     <option value="">불러올 프리셋 선택...</option>
                 </select>
-                <button onclick="loadSelectedPreset()" class="bg-slate-800 text-white px-3 py-1 rounded text-xs font-bold hover:bg-slate-700 transition-all active:scale-95">불러오기</button>
-                <button onclick="openPresetModal(null)" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-blue-700 transition-all active:scale-95">현재 설정 저장</button>
-                <button onclick="deleteSelectedPreset()" class="bg-white text-red-500 border border-red-200 px-3 py-1 rounded text-xs font-bold hover:bg-red-50 transition-all active:scale-95 ml-auto">삭제</button>
+                <button onclick="window.loadSelectedPreset()" class="bg-slate-800 text-white px-3 py-1 rounded text-xs font-bold hover:bg-slate-700 transition-all active:scale-95">불러오기</button>
+                <button onclick="window.openPresetModal(null)" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-blue-700 transition-all active:scale-95">현재 설정 저장</button>
+                <button onclick="window.deleteSelectedPreset()" class="bg-white text-red-500 border border-red-200 px-3 py-1 rounded text-xs font-bold hover:bg-red-50 transition-all active:scale-95 ml-auto">삭제</button>
             </div>
 
             <!-- 입력 필드 -->
@@ -106,7 +106,7 @@
                     <input type="date" id="endDate" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-xs text-center persist">
                 </div>
                 <div class="col-span-1 text-center">
-                    <button onclick="runBacktest()" class="w-full mt-5 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 transition-all active:scale-95 text-center text-center">분석 실행</button>
+                    <button onclick="window.runBacktest()" class="w-full mt-5 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 transition-all active:scale-95 text-center text-center">분석 실행</button>
                 </div>
             </div>
 
@@ -282,7 +282,7 @@
                             <input type="number" id="optIter" value="10000" class="w-full p-2 border border-blue-200 rounded text-center font-bold text-blue-600 text-xs persist text-center text-center text-center text-center text-center">
                         </div>
                         <div class="flex items-end text-center text-center text-center text-center">
-                            <button onclick="runOptimizer()" id="btnRunOptimizer" class="w-full bg-blue-600 text-white p-2.5 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">최적화 시작</button>
+                            <button onclick="window.runOptimizer()" id="btnRunOptimizer" class="w-full bg-blue-600 text-white p-2.5 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">최적화 시작</button>
                         </div>
                     </div>
                 </div>
@@ -395,6 +395,7 @@
         let currentUser = null;
         let globalPresets = [];
 
+        // --- AUTH & LOAD ---
         async function initAuth() {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
@@ -413,6 +414,7 @@
 
         initAuth();
 
+        // --- INPUTS AUTO-SAVE ---
         async function saveAllInputs() {
             if (!currentUser) return;
             const data = {};
@@ -443,6 +445,7 @@
             } catch (e) { console.error("Load error", e); }
         }
 
+        // --- PRESET LOGIC ---
         function setupPresetListener() {
             const presetsCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'presets');
             onSnapshot(presetsCol, (snapshot) => {
@@ -470,7 +473,7 @@
             if (!presetId) return;
             const p = globalPresets.find(item => item.id === presetId);
             if (p) {
-                applyPresetToUI(p);
+                window.applyPresetToUI(p);
                 const indicator = document.getElementById('saveIndicator');
                 indicator.innerText = "Preset Loaded";
                 indicator.style.display = 'block';
@@ -527,7 +530,7 @@
                     };
                 }
                 await savePreset(name, params);
-                closePresetModal();
+                window.closePresetModal();
             };
         };
 
@@ -545,7 +548,7 @@
             if (p.startDate) document.getElementById('startDate').value = p.startDate;
             if (p.endDate) document.getElementById('endDate').value = p.endDate;
             
-            switchTab('backtest');
+            window.switchTab('backtest');
         };
 
         window.saveAllInputs = saveAllInputs;
@@ -564,7 +567,7 @@
             loadInitialData(); 
         };
 
-        function switchTab(tab) {
+        window.switchTab = function(tab) {
             document.getElementById('tabBacktest').classList.toggle('hidden', tab !== 'backtest');
             document.getElementById('tabOptimize').classList.toggle('hidden', tab !== 'optimize');
             document.getElementById('btnTabBacktest').classList.toggle('tab-active', tab === 'backtest');
@@ -714,7 +717,7 @@
             const sortedYears = Object.keys(years).sort(); let prevEndEquity = params.seed; 
             annualBody.innerHTML = sortedYears.map(year => {
                 const y = years[year], startEq = prevEndEquity, ret = ((y.endEquity - startEq) / startEq) * 100;
-                const html = `<tr><td class="px-4 py-1.5 font-bold text-slate-900 text-center">${year}</td><td class="px-4 py-1.5 text-center text-xs">$${startEq.toLocaleString(undefined, {maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-semibold text-center text-xs text-center">$${y.endEquity.toLocaleString(undefined, {maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-bold ${ret >= 0 ? 'text-red-600' : 'text-blue-600'} text-center">${ret >= 0 ? '+' : ''}${ret.toFixed(2)}%</td><td class="px-4 py-1.5 text-blue-500 font-bold text-center">${y.maxDD.toFixed(2)}%</td><td class="px-4 py-1.5 font-bold text-slate-800 text-center text-xs text-center">$${y.realizedSum.toLocaleString(undefined, {maximumFractionDigits:0})}</td></tr>`;
+                const html = `<tr><td class="px-4 py-1.5 font-bold text-slate-900 text-center">${year}</td><td class="px-4 py-1.5 text-center text-xs text-center">$${startEq.toLocaleString(undefined, {maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-semibold text-center text-xs text-center">$${y.endEquity.toLocaleString(undefined, {maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-bold ${ret >= 0 ? 'text-red-600' : 'text-blue-600'} text-center">${ret >= 0 ? '+' : ''}${ret.toFixed(2)}%</td><td class="px-4 py-1.5 text-blue-500 font-bold text-center">${y.maxDD.toFixed(2)}%</td><td class="px-4 py-1.5 font-bold text-slate-800 text-center text-xs text-center">$${y.realizedSum.toLocaleString(undefined, {maximumFractionDigits:0})}</td></tr>`;
                 prevEndEquity = y.endEquity; return html;
             }).join('');
             let heatmapHtml = "", rollingPrevEquity = params.seed;
@@ -807,7 +810,6 @@
             renderOptimizeTable(); document.getElementById('optStatus').innerText = `(${optimizationResults.length}개 발견)`; btn.disabled = false;
         }
 
-        // [핵심 수정] Published 버전에서도 에러 없이 작동하도록 인자를 명시적으로 전달
         function renderOptimizeTable() {
             const criteria1 = document.getElementById('optSortCriteria').value, criteria2 = document.getElementById('optSortCriteria2').value, optBody = document.getElementById('optBody');
             const getCompareFunc = (criteria) => (a, b) => {
@@ -821,20 +823,20 @@
             if (optimizationResults.length === 0) { optBody.innerHTML = `<tr><td colspan="12" class="py-20 text-red-400 italic font-bold text-center">조건을 만족하는 결과가 없습니다.</td></tr>`; return; }
             optBody.innerHTML = finalSelection.map((r, idx) => `
                 <tr class="clickable-row border-b text-center">
-                    <td class="px-4 py-3 font-bold" onclick="applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})">${idx + 1}</td>
-                    <td class="px-2 py-3 font-semibold text-center">${r.N}</td>
-                    <td class="px-2 py-3 text-red-600 font-bold text-center">${r.BuyP}%</td>
-                    <td class="px-2 py-3 text-blue-600 font-bold text-center">${r.SellP}%</td>
-                    <td class="px-2 py-3 font-semibold text-center">${r.D}</td>
-                    <td class="px-4 py-3 font-black text-red-600 text-center">${r.cagr.toFixed(1)}%</td>
-                    <td class="px-4 py-3 font-bold text-blue-500 text-center">${r.mdd.toFixed(1)}%</td>
-                    <td class="px-4 py-3 font-medium text-slate-700 text-center">${r.gpr.toFixed(2)}</td>
-                    <td class="px-4 py-3 font-medium text-purple-600 text-center">${r.calmar.toFixed(2)}</td>
-                    <td class="px-4 py-3 text-slate-400 text-center">${r.painIndex.toFixed(2)}</td>
-                    <td class="px-4 py-3 bg-red-50 font-black text-red-700 border-x border-red-100 text-center">${r.pf.toFixed(2)}</td>
-                    <td class="px-4 py-2 flex items-center justify-center gap-1.5 text-center">
-                        <button onclick="applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center">적용</button>
-                        <button onclick="window.openPresetModal({N:${r.N}, BuyP:${r.BuyP}, SellP:${r.SellP}, D:${r.D}, startDate:'${r.startDate}', endDate:'${r.endDate}'})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center" title="프리셋으로 저장">★</button>
+                    <td class="px-4 py-3 font-bold" onclick="window.applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})">${idx + 1}</td>
+                    <td class="px-2 py-3 font-semibold text-center text-center">${r.N}</td>
+                    <td class="px-2 py-3 text-red-600 font-bold text-center text-center text-center">${r.BuyP}%</td>
+                    <td class="px-2 py-3 text-blue-600 font-bold text-center text-center text-center text-center">${r.SellP}%</td>
+                    <td class="px-2 py-3 font-semibold text-center text-center text-center text-center">${r.D}</td>
+                    <td class="px-4 py-3 font-black text-red-600 text-center text-center text-center text-center">${r.cagr.toFixed(1)}%</td>
+                    <td class="px-4 py-3 font-bold text-blue-500 text-center text-center text-center text-center text-center text-center">${r.mdd.toFixed(1)}%</td>
+                    <td class="px-4 py-3 font-medium text-slate-700 text-center text-center text-center text-center text-center text-center">${r.gpr.toFixed(2)}</td>
+                    <td class="px-4 py-3 font-medium text-purple-600 text-center text-center text-center text-center text-center text-center text-center">${r.calmar.toFixed(2)}</td>
+                    <td class="px-4 py-3 text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center">${r.painIndex.toFixed(2)}</td>
+                    <td class="px-4 py-3 bg-red-50 font-black text-red-700 border-x border-red-100 text-center text-center text-center text-center text-center text-center text-center text-center">${r.pf.toFixed(2)}</td>
+                    <td class="px-4 py-2 flex items-center justify-center gap-1.5 text-center text-center text-center text-center text-center text-center text-center text-center text-center">
+                        <button onclick="window.applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center text-center text-center text-center text-center">적용</button>
+                        <button onclick="window.openPresetModal(${JSON.stringify(r).replace(/"/g, '&quot;')})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center text-center text-center text-center text-center" title="프리셋으로 저장">★</button>
                     </td>
                 </tr>`).join('');
         }
@@ -846,7 +848,7 @@
             document.getElementById('maxD').value = d;
             document.getElementById('startDate').value = document.getElementById('optStartDate').value;
             document.getElementById('endDate').value = document.getElementById('optEndDate').value;
-            switchTab('backtest');
+            window.switchTab('backtest');
         }
     </script>
 </body>
