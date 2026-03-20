@@ -247,7 +247,7 @@
                             </div>
                         </div>
                         <div class="space-y-1 text-center text-center text-center text-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center text-center">매수 (P1%) 범위</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center text-center text-center">매수 (P1%) 범위</label>
                             <div class="flex gap-1 text-center text-center text-center">
                                 <input type="number" id="optBuyMin" value="-1" step="0.1" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center">
                                 <input type="number" id="optBuyMax" value="2" step="0.1" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center">
@@ -395,7 +395,6 @@
         let currentUser = null;
         let globalPresets = [];
 
-        // --- AUTH & LOAD ---
         async function initAuth() {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
@@ -414,7 +413,6 @@
 
         initAuth();
 
-        // --- INPUTS AUTO-SAVE ---
         async function saveAllInputs() {
             if (!currentUser) return;
             const data = {};
@@ -445,7 +443,6 @@
             } catch (e) { console.error("Load error", e); }
         }
 
-        // --- PRESET LOGIC ---
         function setupPresetListener() {
             const presetsCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'presets');
             onSnapshot(presetsCol, (snapshot) => {
@@ -538,7 +535,6 @@
             document.getElementById('modalOverlay').style.display = 'none';
         };
 
-        // [수정] 적용 버튼 시 이동만 하고 자동 실행 중단
         window.applyPresetToUI = function(p) {
             document.getElementById('divN').value = p.N || p.divN || 5;
             document.getElementById('paramBuyP').value = p.BuyP || p.paramBuyP || 1;
@@ -550,7 +546,6 @@
             if (p.endDate) document.getElementById('endDate').value = p.endDate;
             
             switchTab('backtest');
-            // window.runBacktest(); // 자동 실행 주석 처리
         };
 
         window.saveAllInputs = saveAllInputs;
@@ -812,6 +807,7 @@
             renderOptimizeTable(); document.getElementById('optStatus').innerText = `(${optimizationResults.length}개 발견)`; btn.disabled = false;
         }
 
+        // [핵심 수정] Published 버전에서도 에러 없이 작동하도록 인자를 명시적으로 전달
         function renderOptimizeTable() {
             const criteria1 = document.getElementById('optSortCriteria').value, criteria2 = document.getElementById('optSortCriteria2').value, optBody = document.getElementById('optBody');
             const getCompareFunc = (criteria) => (a, b) => {
@@ -825,26 +821,25 @@
             if (optimizationResults.length === 0) { optBody.innerHTML = `<tr><td colspan="12" class="py-20 text-red-400 italic font-bold text-center">조건을 만족하는 결과가 없습니다.</td></tr>`; return; }
             optBody.innerHTML = finalSelection.map((r, idx) => `
                 <tr class="clickable-row border-b text-center">
-                    <td class="px-4 py-3 font-bold" onclick="applyPresetToUI(${JSON.stringify(r).replace(/"/g, '&quot;')})">${idx + 1}</td>
-                    <td class="px-2 py-3 font-semibold text-center text-center">${r.N}</td>
-                    <td class="px-2 py-3 text-red-600 font-bold text-center text-center">${r.BuyP}%</td>
-                    <td class="px-2 py-3 text-blue-600 font-bold text-center text-center text-center">${r.SellP}%</td>
-                    <td class="px-2 py-3 font-semibold text-center text-center text-center">${r.D}</td>
-                    <td class="px-4 py-3 font-black text-red-600 text-center text-center text-center">${r.cagr.toFixed(1)}%</td>
-                    <td class="px-4 py-3 font-bold text-blue-500 text-center text-center text-center text-center text-center">${r.mdd.toFixed(1)}%</td>
-                    <td class="px-4 py-3 font-medium text-slate-700 text-center text-center text-center text-center text-center">${r.gpr.toFixed(2)}</td>
-                    <td class="px-4 py-3 font-medium text-purple-600 text-center text-center text-center text-center text-center text-center text-center">${r.calmar.toFixed(2)}</td>
-                    <td class="px-4 py-3 text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center">${r.painIndex.toFixed(2)}</td>
-                    <td class="px-4 py-3 bg-red-50 font-black text-red-700 border-x border-red-100 text-center text-center text-center text-center text-center text-center text-center text-center">${r.pf.toFixed(2)}</td>
-                    <td class="px-4 py-2 flex items-center justify-center gap-1.5 text-center text-center text-center text-center text-center text-center text-center text-center text-center">
-                        <button onclick="applyPresetToUI(${JSON.stringify(r).replace(/"/g, '&quot;')})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center text-center text-center text-center text-center">적용</button>
-                        <button onclick="window.openPresetModal(${JSON.stringify(r).replace(/"/g, '&quot;')})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center text-center text-center text-center text-center" title="프리셋으로 저장">★</button>
+                    <td class="px-4 py-3 font-bold" onclick="applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})">${idx + 1}</td>
+                    <td class="px-2 py-3 font-semibold text-center">${r.N}</td>
+                    <td class="px-2 py-3 text-red-600 font-bold text-center">${r.BuyP}%</td>
+                    <td class="px-2 py-3 text-blue-600 font-bold text-center">${r.SellP}%</td>
+                    <td class="px-2 py-3 font-semibold text-center">${r.D}</td>
+                    <td class="px-4 py-3 font-black text-red-600 text-center">${r.cagr.toFixed(1)}%</td>
+                    <td class="px-4 py-3 font-bold text-blue-500 text-center">${r.mdd.toFixed(1)}%</td>
+                    <td class="px-4 py-3 font-medium text-slate-700 text-center">${r.gpr.toFixed(2)}</td>
+                    <td class="px-4 py-3 font-medium text-purple-600 text-center">${r.calmar.toFixed(2)}</td>
+                    <td class="px-4 py-3 text-slate-400 text-center">${r.painIndex.toFixed(2)}</td>
+                    <td class="px-4 py-3 bg-red-50 font-black text-red-700 border-x border-red-100 text-center">${r.pf.toFixed(2)}</td>
+                    <td class="px-4 py-2 flex items-center justify-center gap-1.5 text-center">
+                        <button onclick="applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center">적용</button>
+                        <button onclick="window.openPresetModal({N:${r.N}, BuyP:${r.BuyP}, SellP:${r.SellP}, D:${r.D}, startDate:'${r.startDate}', endDate:'${r.endDate}'})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center" title="프리셋으로 저장">★</button>
                     </td>
                 </tr>`).join('');
         }
 
-        // 최적화 버튼에서 직접 호출하는 경우를 위한 함수
-        function applyParams(n, buy, sell, d) {
+        window.applyParams = function(n, buy, sell, d) {
             document.getElementById('divN').value = n; 
             document.getElementById('paramBuyP').value = buy;
             document.getElementById('paramSellP').value = sell; 
@@ -852,7 +847,6 @@
             document.getElementById('startDate').value = document.getElementById('optStartDate').value;
             document.getElementById('endDate').value = document.getElementById('optEndDate').value;
             switchTab('backtest');
-            // window.runBacktest(); // 자동 실행 중단
         }
     </script>
 </body>
