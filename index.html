@@ -270,7 +270,7 @@
                     </div>
                     <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-center text-center text-center">
                         <div class="space-y-1 text-center text-center text-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center text-center text-center">최적화 시작일</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center">최적화 시작일</label>
                             <input type="date" id="optStartDate" value="2014-01-01" class="w-full p-2 border rounded text-xs persist text-center text-center text-center text-center text-center">
                         </div>
                         <div class="space-y-1 text-center text-center text-center text-center text-center">
@@ -295,7 +295,7 @@
                             <input type="number" id="filterCAGR" value="30" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist text-center text-center text-center text-center text-center text-center text-center text-center">
                         </div>
                         <div class="space-y-1 text-center text-center text-center text-center text-center text-center text-center text-center text-center">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center text-center text-center text-center text-center text-center text-center text-center text-center">최대 MDD (%)</label>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">최대 MDD (%)</label>
                             <input type="number" id="filterMDD" value="40" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold text-red-500 persist text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                         </div>
                         <div class="space-y-1 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
@@ -327,7 +327,7 @@
                         <span id="optStatus" class="text-slate-400 text-[9px] font-normal uppercase mt-0.5 text-center text-center text-center text-center text-center text-center text-center">Idle</span>
                     </div>
                     <div class="flex flex-col md:flex-row items-center gap-4 text-center text-center text-center text-center text-center text-center text-center">
-                        <div class="flex items-center gap-2 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
+                        <div class="flex items-center gap-2 text-center text-center text-center text-center text-center text-center text-center">
                             <label class="text-[9px] font-bold uppercase text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">1차 정렬 (Top 30):</label>
                             <select id="optSortCriteria" onchange="renderOptimizeTable()" class="bg-slate-700 text-white text-[10px] font-bold p-1 rounded outline-none border border-slate-600 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                                 <option value="calmar" selected>Calmar Ratio</option>
@@ -338,8 +338,8 @@
                                 <option value="pain">Pain Index (낮은순)</option>
                             </select>
                         </div>
-                        <div class="flex items-center gap-2 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
-                            <label class="text-[9px] font-bold uppercase text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center text-center">2차 정렬:</label>
+                        <div class="flex items-center gap-2 text-center text-center text-center text-center text-center text-center text-center">
+                            <label class="text-[9px] font-bold uppercase text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">2차 정렬:</label>
                             <select id="optSortCriteria2" onchange="renderOptimizeTable()" class="bg-slate-700 text-blue-300 text-[10px] font-bold p-1 rounded outline-none border border-blue-600/50 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                                 <option value="none">없음</option>
                                 <option value="pf">Profit Factor</option>
@@ -513,6 +513,7 @@
             setTimeout(() => { indicator.style.display = 'none'; indicator.innerText = "Settings Saved"; }, 2000);
         }
 
+        // [수정] 모달 열기 함수를 전역에서 안정적으로 호출 가능하도록 수정
         window.openPresetModal = function(autoParams = null) {
             const overlay = document.getElementById('modalOverlay');
             const input = document.getElementById('presetNameInput');
@@ -526,7 +527,10 @@
                 let params;
                 if (autoParams) {
                     params = {
-                        N: autoParams.N, BuyP: autoParams.BuyP, SellP: autoParams.SellP, D: autoParams.D,
+                        N: autoParams.N, 
+                        BuyP: autoParams.BuyP, 
+                        SellP: autoParams.SellP, 
+                        D: autoParams.D,
                         seed: document.getElementById('seed').value, 
                         fee: document.getElementById('fee').value,
                         startDate: autoParams.startDate || document.getElementById('startDate').value,
@@ -849,6 +853,7 @@
             if (optimizationResults.length === 0) { optBody.innerHTML = `<tr><td colspan="12" class="py-20 text-red-400 italic font-bold text-center">조건을 만족하는 결과가 없습니다.</td></tr>`; return; }
             
             optBody.innerHTML = finalSelection.map((r, idx) => {
+                // [수정] 저장을 위해 결과 요소를 제외하고 딱 설정값만 포함
                 const essentialParams = { N: r.N, BuyP: r.BuyP, SellP: r.SellP, D: r.D, startDate: r.startDate, endDate: r.endDate };
                 const paramStr = JSON.stringify(essentialParams).replace(/"/g, '&quot;');
                 const getCellClass = (c) => criteria1 === c ? 'bg-blue-50 font-black border-x border-blue-100' : '';
