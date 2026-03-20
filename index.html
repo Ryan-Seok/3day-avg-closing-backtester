@@ -247,7 +247,7 @@
                             </div>
                         </div>
                         <div class="space-y-1 text-center text-center text-center text-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center text-center text-center">매수 (P1%) 범위</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center text-center">매수 (P1%) 범위</label>
                             <div class="flex gap-1 text-center text-center text-center">
                                 <input type="number" id="optBuyMin" value="-1" step="0.1" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center">
                                 <input type="number" id="optBuyMax" value="2" step="0.1" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center">
@@ -294,11 +294,11 @@
                             <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center text-center text-center text-center text-center text-center text-center text-center">최소 CAGR (%)</label>
                             <input type="number" id="filterCAGR" value="30" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist text-center text-center text-center text-center text-center text-center text-center text-center">
                         </div>
-                        <div class="space-y-1 text-center text-center text-center text-center text-center text-center text-center text-center">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center text-center text-center text-center text-center text-center text-center text-center text-center">최대 MDD (%)</label>
-                            <input type="number" id="filterMDD" value="40" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold text-red-500 persist text-center text-center text-center text-center text-center text-center text-center text-center text-center">
-                        </div>
                         <div class="space-y-1 text-center text-center text-center text-center text-center text-center text-center text-center text-center">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center text-center text-center text-center text-center text-center text-center text-center text-center">최대 MDD (%)</label>
+                            <input type="number" id="filterMDD" value="40" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold text-red-500 persist text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
+                        </div>
+                        <div class="space-y-1 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                             <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">최소 Calmar</label>
                             <input type="number" id="filterCalmar" value="1.4" step="0.1" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                         </div>
@@ -339,7 +339,7 @@
                             </select>
                         </div>
                         <div class="flex items-center gap-2 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
-                            <label class="text-[9px] font-bold uppercase text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">2차 정렬:</label>
+                            <label class="text-[9px] font-bold uppercase text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center text-center">2차 정렬:</label>
                             <select id="optSortCriteria2" onchange="renderOptimizeTable()" class="bg-slate-700 text-blue-300 text-[10px] font-bold p-1 rounded outline-none border border-blue-600/50 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                                 <option value="none">없음</option>
                                 <option value="pf">Profit Factor</option>
@@ -496,7 +496,17 @@
             if (!currentUser) return;
             const presetId = crypto.randomUUID();
             const presetRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'presets', presetId);
-            await setDoc(presetRef, { name, ...params, createdAt: Date.now() });
+            const coreParams = {
+                N: params.N,
+                BuyP: params.BuyP,
+                SellP: params.SellP,
+                D: params.D,
+                seed: params.seed,
+                fee: params.fee,
+                startDate: params.startDate,
+                endDate: params.endDate
+            };
+            await setDoc(presetRef, { name, ...coreParams, createdAt: Date.now() });
             const indicator = document.getElementById('saveIndicator');
             indicator.innerText = "Preset Saved";
             indicator.style.display = 'block';
@@ -517,16 +527,21 @@
                 if (autoParams) {
                     params = {
                         N: autoParams.N, BuyP: autoParams.BuyP, SellP: autoParams.SellP, D: autoParams.D,
-                        seed: document.getElementById('seed').value, fee: document.getElementById('fee').value,
+                        seed: document.getElementById('seed').value, 
+                        fee: document.getElementById('fee').value,
                         startDate: autoParams.startDate || document.getElementById('startDate').value,
                         endDate: autoParams.endDate || document.getElementById('endDate').value
                     };
                 } else {
                     params = {
-                        seed: document.getElementById('seed').value, fee: document.getElementById('fee').value,
-                        N: document.getElementById('divN').value, BuyP: document.getElementById('paramBuyP').value,
-                        SellP: document.getElementById('paramSellP').value, D: document.getElementById('maxD').value,
-                        startDate: document.getElementById('startDate').value, endDate: document.getElementById('endDate').value
+                        seed: document.getElementById('seed').value, 
+                        fee: document.getElementById('fee').value,
+                        N: document.getElementById('divN').value, 
+                        BuyP: document.getElementById('paramBuyP').value,
+                        SellP: document.getElementById('paramSellP').value, 
+                        D: document.getElementById('maxD').value,
+                        startDate: document.getElementById('startDate').value, 
+                        endDate: document.getElementById('endDate').value
                     };
                 }
                 await savePreset(name, params);
@@ -548,6 +563,7 @@
             if (p.startDate) document.getElementById('startDate').value = p.startDate;
             if (p.endDate) document.getElementById('endDate').value = p.endDate;
             
+            window.clearBacktestResults();
             window.switchTab('backtest');
         };
 
@@ -697,7 +713,8 @@
             document.getElementById('statFinal').innerText = '$' + res.finalVal.toLocaleString(undefined, {maximumFractionDigits:0});
             document.getElementById('statReturn').innerText = `${res.totalRet.toFixed(0)}%`;
             document.getElementById('statCAGR').innerText = `${res.cagr.toFixed(2)}%`;
-            document.getElementById('statMDD').innerText = `${res.mdd.toFixed(2)}%`;
+            // 백테스트 패널 MDD 마이너스 표시
+            document.getElementById('statMDD').innerText = `-${res.mdd.toFixed(2)}%`;
             document.getElementById('statWinRate').innerText = `${res.winRate.toFixed(1)}%`;
             document.getElementById('statPF').innerText = res.pf.toFixed(2);
             document.getElementById('statPain').innerText = res.painIndex.toFixed(2);
@@ -717,7 +734,8 @@
             const sortedYears = Object.keys(years).sort(); let prevEndEquity = params.seed; 
             annualBody.innerHTML = sortedYears.map(year => {
                 const y = years[year], startEq = prevEndEquity, ret = ((y.endEquity - startEq) / startEq) * 100;
-                const html = `<tr><td class="px-4 py-1.5 font-bold text-slate-900 text-center">${year}</td><td class="px-4 py-1.5 text-center text-xs text-center">$${startEq.toLocaleString(undefined, {maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-semibold text-center text-xs text-center">$${y.endEquity.toLocaleString(undefined, {maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-bold ${ret >= 0 ? 'text-red-600' : 'text-blue-600'} text-center">${ret >= 0 ? '+' : ''}${ret.toFixed(2)}%</td><td class="px-4 py-1.5 text-blue-500 font-bold text-center">${y.maxDD.toFixed(2)}%</td><td class="px-4 py-1.5 font-bold text-slate-800 text-center text-xs text-center">$${y.realizedSum.toLocaleString(undefined, {maximumFractionDigits:0})}</td></tr>`;
+                // 연도별 성과 분석 MDD 마이너스 표시
+                const html = `<tr><td class="px-4 py-1.5 font-bold text-slate-900 text-center text-center">${year}</td><td class="px-4 py-1.5 text-center text-xs text-center">$${startEq.toLocaleString(undefined, {maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-semibold text-center text-xs text-center text-center">$${y.endEquity.toLocaleString(undefined, {maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-bold ${ret >= 0 ? 'text-red-600' : 'text-blue-600'} text-center text-center text-center">${ret >= 0 ? '+' : ''}${ret.toFixed(2)}%</td><td class="px-4 py-1.5 text-blue-500 font-bold text-center text-center">-${y.maxDD.toFixed(2)}%</td><td class="px-4 py-1.5 font-bold text-xs text-center text-center text-center">$${y.realizedSum.toLocaleString(undefined, {maximumFractionDigits:0})}</td></tr>`;
                 prevEndEquity = y.endEquity; return html;
             }).join('');
             let heatmapHtml = "", rollingPrevEquity = params.seed;
@@ -767,7 +785,7 @@
                 let eventClass = "text-slate-400"; if (isProfitSell) eventClass = "bg-red-600 text-white px-2 py-0.5 rounded font-black";
                 else if (isLossSell) eventClass = "bg-blue-600 text-white px-2 py-0.5 rounded font-black";
                 else if (isBuy) eventClass = "bg-slate-700 text-white px-2 py-0.5 rounded font-black";
-                return `<tr class="hover:bg-slate-50 border-b text-center"><td class="px-3 py-2 font-mono text-left text-xs">${l.date}</td><td class="px-3 py-2 text-right font-mono text-xs text-right">$${l.rawClose}</td><td class="px-3 py-2 text-right ${l.change>=0?'text-red-600':'text-blue-600'} font-bold text-xs text-right">${l.change.toFixed(2)}%</td><td class="px-3 py-2 text-right text-slate-600 font-bold text-xs text-center">${l.bought||'-'}</td><td class="px-3 py-2 text-center font-bold text-xs text-center">${l.port}</td><td class="px-3 py-2 text-right font-bold text-slate-800 text-xs text-right">$${l.equity.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td class="px-3 py-2 text-right font-black ${l.realized>0?'text-red-600':l.realized<0?'text-blue-600':''} text-center text-xs text-center">${l.realized?l.realized.toLocaleString(undefined,{maximumFractionDigits:0}):'-'}</td><td class="px-3 py-2 text-center text-center"><span class="text-[9px] uppercase ${eventClass} text-center text-center text-center">${l.event}</span></td><td class="px-3 py-2 text-right font-bold text-red-400 bg-red-50/20 text-xs text-right text-right">${l.dd > 0 ? '-' : ''}${l.dd.toFixed(2)}%</td></tr>`;
+                return `<tr class="hover:bg-slate-50 border-b text-center"><td class="px-3 py-2 font-mono text-left text-xs">${l.date}</td><td class="px-3 py-2 text-right font-mono text-xs text-right">$${l.rawClose}</td><td class="px-3 py-2 text-right ${l.change>=0?'text-red-600':'text-blue-600'} font-bold text-xs text-right">${l.change.toFixed(2)}%</td><td class="px-3 py-2 text-right text-slate-600 font-bold text-xs text-center">${l.bought||'-'}</td><td class="px-3 py-2 text-center font-bold text-xs text-center">${l.port}</td><td class="px-3 py-2 text-right font-bold text-slate-800 text-xs text-right">$${l.equity.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td class="px-3 py-2 text-right font-black ${l.realized>0?'text-red-600':l.realized<0?'text-blue-600':''} text-center text-xs text-center">${l.realized?l.realized.toLocaleString(undefined,{maximumFractionDigits:0}):'-'}</td><td class="px-3 py-2 text-center text-center text-center"><span class="text-[9px] uppercase ${eventClass} text-center text-center text-center">${l.event}</span></td><td class="px-3 py-2 text-right font-bold text-red-400 bg-red-50/20 text-xs text-right text-right">${l.dd > 0 ? '-' : ''}${l.dd.toFixed(2)}%</td></tr>`;
             }).join('');
             document.getElementById('logCount').innerText = `${res.dailyLogs.length} 거래일 기록 완료`;
         }
@@ -820,37 +838,51 @@
             };
             optimizationResults.sort(getCompareFunc(criteria1));
             let finalSelection = optimizationResults.slice(0, 30); if (criteria2 !== 'none') { finalSelection.sort(getCompareFunc(criteria2)); }
+            
+            const headerMap = { cagr: 5, mdd: 6, gpr: 7, calmar: 8, pain: 9, pf: 10 };
+            const ths = document.querySelectorAll('#tabOptimize table thead th');
+            ths.forEach(th => th.classList.remove('bg-slate-700', 'text-yellow-400'));
+            if (headerMap[criteria1]) {
+                ths[headerMap[criteria1]].classList.add('bg-slate-700', 'text-yellow-400');
+            }
+
             if (optimizationResults.length === 0) { optBody.innerHTML = `<tr><td colspan="12" class="py-20 text-red-400 italic font-bold text-center">조건을 만족하는 결과가 없습니다.</td></tr>`; return; }
+            
             optBody.innerHTML = finalSelection.map((r, idx) => {
-                // [핵심 수정] 저장에 필요한 필수 파라미터만 추출하여 경량화
-                const essentialParams = { 
-                    N: r.N, 
-                    BuyP: r.BuyP, 
-                    SellP: r.SellP, 
-                    D: r.D, 
-                    startDate: r.startDate, 
-                    endDate: r.endDate 
-                };
+                const essentialParams = { N: r.N, BuyP: r.BuyP, SellP: r.SellP, D: r.D, startDate: r.startDate, endDate: r.endDate };
                 const paramStr = JSON.stringify(essentialParams).replace(/"/g, '&quot;');
+                const getCellClass = (c) => criteria1 === c ? 'bg-blue-50 font-black border-x border-blue-100' : '';
                 
                 return `
-                <tr class="clickable-row border-b text-center">
+                <tr class="clickable-row border-b text-center text-center text-center">
                     <td class="px-4 py-3 font-bold" onclick="window.applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})">${idx + 1}</td>
-                    <td class="px-2 py-3 font-semibold text-center text-center">${r.N}</td>
-                    <td class="px-2 py-3 text-red-600 font-bold text-center text-center text-center">${r.BuyP}%</td>
-                    <td class="px-2 py-3 text-blue-600 font-bold text-center text-center text-center text-center">${r.SellP}%</td>
-                    <td class="px-2 py-3 font-semibold text-center text-center text-center text-center">${r.D}</td>
-                    <td class="px-4 py-3 font-black text-red-600 text-center text-center text-center text-center">${r.cagr.toFixed(1)}%</td>
-                    <td class="px-4 py-3 font-bold text-blue-500 text-center text-center text-center text-center text-center text-center">${r.mdd.toFixed(1)}%</td>
-                    <td class="px-4 py-3 font-medium text-slate-700 text-center text-center text-center text-center text-center text-center">${r.gpr.toFixed(2)}</td>
-                    <td class="px-4 py-3 font-medium text-purple-600 text-center text-center text-center text-center text-center text-center text-center">${r.calmar.toFixed(2)}</td>
-                    <td class="px-4 py-3 text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center">${r.painIndex.toFixed(2)}</td>
-                    <td class="px-4 py-3 bg-red-50 font-black text-red-700 border-x border-red-100 text-center text-center text-center text-center text-center text-center text-center text-center">${r.pf.toFixed(2)}</td>
-                    <td class="px-4 py-2 flex items-center justify-center gap-1.5 text-center text-center text-center text-center text-center text-center text-center text-center text-center">
+                    <td class="px-2 py-3 font-semibold text-center text-center text-center text-center">${r.N}</td>
+                    <td class="px-2 py-3 text-red-600 font-bold text-center text-center text-center text-center">${r.BuyP}%</td>
+                    <td class="px-2 py-3 text-blue-600 font-bold text-center text-center text-center text-center text-center">${r.SellP}%</td>
+                    <td class="px-2 py-3 font-semibold text-center text-center text-center text-center text-center">${r.D}</td>
+                    <td class="px-4 py-3 font-black text-red-600 text-center text-center text-center text-center ${getCellClass('cagr')}">${r.cagr.toFixed(1)}%</td>
+                    <td class="px-4 py-3 font-bold text-blue-500 text-center text-center text-center text-center text-center text-center ${getCellClass('mdd')}">-${r.mdd.toFixed(1)}%</td>
+                    <td class="px-4 py-3 font-medium text-slate-700 text-center text-center text-center text-center text-center text-center ${getCellClass('gpr')}">${r.gpr.toFixed(2)}</td>
+                    <td class="px-4 py-3 font-medium text-purple-600 text-center text-center text-center text-center text-center text-center text-center ${getCellClass('calmar')}">${r.calmar.toFixed(2)}</td>
+                    <td class="px-4 py-3 text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center ${getCellClass('pain')}">${r.painIndex.toFixed(2)}</td>
+                    <td class="px-4 py-3 font-black text-red-700 text-center text-center text-center text-center text-center text-center text-center text-center ${getCellClass('pf')}">${r.pf.toFixed(2)}</td>
+                    <td class="px-4 py-2 flex items-center justify-center gap-1.5 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
                         <button onclick="window.applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center text-center text-center text-center text-center">적용</button>
                         <button onclick="window.openPresetModal(${paramStr})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center text-center text-center text-center text-center" title="프리셋으로 저장">★</button>
                     </td>
                 </tr>`}).join('');
+        }
+
+        window.clearBacktestResults = function() {
+            document.getElementById('statsSection').classList.add('hidden');
+            document.getElementById('annualSection').classList.add('hidden');
+            document.getElementById('heatmapSection').classList.add('hidden');
+            if (equityChart) {
+                equityChart.destroy();
+                equityChart = null;
+            }
+            document.getElementById('tradeLog').innerHTML = "";
+            document.getElementById('logCount').innerText = "Ready";
         }
 
         window.applyParams = function(n, buy, sell, d) {
@@ -860,6 +892,8 @@
             document.getElementById('maxD').value = d;
             document.getElementById('startDate').value = document.getElementById('optStartDate').value;
             document.getElementById('endDate').value = document.getElementById('optEndDate').value;
+            
+            window.clearBacktestResults();
             window.switchTab('backtest');
         }
     </script>
