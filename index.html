@@ -10,522 +10,814 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #f1f5f9; }
-        .stat-card { border-left: 4px solid #3b82f6; transition: transform 0.2s; }
+        .stat-card { border-left: 4px solid #3b82f6; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .chart-container { position: relative; width: 100%; }
         .table-container { max-height: 600px; overflow-y: auto; border-radius: 0 0 12px 12px; }
         .sticky-th { position: sticky; top: 0; background-color: #1e293b; color: white; z-index: 10; }
         .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: 700; }
         .progress-bar { transition: width 0.3s ease-in-out; }
-        .clickable-row { cursor: pointer; transition: background-color 0.15s; }
         .clickable-row:hover { background-color: #f8fafc !important; }
-        .save-indicator { position: fixed; bottom: 20px; right: 20px; padding: 8px 16px; border-radius: 9999px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: none; z-index: 50; }
         .compact-table th { padding: 4px 12px !important; font-size: 9px !important; }
         .compact-table td { padding: 4px 12px !important; font-size: 11px !important; }
         .heatmap-table th { font-size: 9px; padding: 6px 2px; text-transform: uppercase; color: #64748b; }
-        .heatmap-table td { font-size: 10px; padding: 10px 2px; font-weight: 700; border: 1px solid white; transition: all 0.2s; }
-        #modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(2px); }
+        .heatmap-table td { font-size: 10px; padding: 10px 2px; font-weight: 700; border: 1px solid white; }
+
+        .toast {
+            position: fixed; bottom: 24px; right: 24px;
+            padding: 10px 18px; border-radius: 999px;
+            font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+            color: white; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+            opacity: 0; transform: translateY(8px);
+            transition: opacity .2s, transform .2s;
+            pointer-events: none; z-index: 999;
+        }
+        .toast.show { opacity: 1; transform: none; }
     </style>
 </head>
-<body class="p-4 md:p-8 text-slate-800 text-center">
-    <div id="saveIndicator" class="save-indicator bg-emerald-500 text-white shadow-lg">Settings Saved</div>
+<body class="p-4 md:p-8 text-slate-800">
 
-    <!-- 프리셋 저장 모달 -->
-    <div id="modalOverlay">
-        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm border border-slate-200">
-            <h3 class="text-lg font-bold mb-2 text-center">현재 설정 저장</h3>
-            <p class="text-xs text-slate-500 mb-4 text-center">저장할 프리셋 이름을 입력하세요.</p>
-            <input type="text" id="presetNameInput" class="w-full p-2 border border-slate-300 rounded mb-6 outline-none focus:border-blue-500 text-center" placeholder="예: 보수적 세팅">
-            <div class="flex gap-2">
-                <button onclick="window.closePresetModal()" class="flex-1 py-2 bg-slate-100 rounded font-bold text-slate-600 hover:bg-slate-200">취소</button>
-                <button id="confirmSavePreset" class="flex-1 py-2 bg-blue-600 rounded font-bold text-white hover:bg-blue-700">저장</button>
-            </div>
-        </div>
-    </div>
+    <!-- 토스트 알림 -->
+    <div id="toast" class="toast bg-emerald-500"></div>
 
     <div class="max-w-7xl mx-auto">
-        <!-- 헤더 섹션 -->
+
+        <!-- 헤더 -->
         <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
-            <div class="text-left">
+            <div>
                 <h1 class="text-3xl font-bold text-slate-900 tracking-tight italic">3일 종가평균매매법</h1>
-                <div id="dataInfo" class="mt-1 flex items-center gap-2">
+                <div class="mt-1 flex items-center gap-2">
                     <span id="dataStatusDot" class="inline-block w-2 h-2 bg-slate-300 rounded-full animate-pulse"></span>
                     <p id="dataPeriodDisplay" class="text-slate-600 font-semibold text-sm">데이터 로드 중...</p>
                 </div>
             </div>
             <div class="flex gap-6 text-sm font-medium text-slate-500">
-                <button onclick="window.switchTab('backtest')" id="btnTabBacktest" class="pb-2 tab-active transition-colors">전략 백테스트</button>
-                <button onclick="window.switchTab('optimize')" id="btnTabOptimize" class="pb-2 hover:text-blue-500 transition-colors">파라미터 최적화</button>
+                <button onclick="switchTab('backtest')" id="btnTabBacktest" class="pb-2 tab-active">전략 백테스트</button>
+                <button onclick="switchTab('optimize')" id="btnTabOptimize" class="pb-2 hover:text-blue-500">파라미터 최적화</button>
             </div>
         </div>
 
-        <!-- 탭 1: 백테스트 -->
+        <!-- ══════════════ 백테스트 탭 ══════════════ -->
         <div id="tabBacktest">
+
+            <!-- 프리셋 관리 바 -->
             <div class="flex flex-wrap items-center gap-2 mb-4 bg-slate-100 p-2 rounded-lg border border-slate-200">
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-tighter ml-2">설정 프리셋:</span>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-tighter ml-2">프리셋:</span>
                 <select id="presetSelect" class="bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold outline-none focus:border-blue-500 min-w-[180px]">
-                    <option value="">불러올 프리셋 선택...</option>
+                    <option value="">── 프리셋 선택 ──</option>
                 </select>
-                <button onclick="window.loadSelectedPreset()" class="bg-slate-800 text-white px-3 py-1 rounded text-xs font-bold hover:bg-slate-700 transition-all active:scale-95">불러오기</button>
-                <button onclick="window.openPresetModal(null)" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-blue-700 transition-all active:scale-95">현재 설정 저장</button>
-                <button onclick="window.deleteSelectedPreset()" class="bg-white text-red-500 border border-red-200 px-3 py-1 rounded text-xs font-bold hover:bg-red-50 transition-all active:scale-95 ml-auto">삭제</button>
+                <button onclick="loadSelectedPreset()" class="bg-slate-800 text-white px-3 py-1 rounded text-xs font-bold hover:bg-slate-700 active:scale-95">불러오기</button>
+                <button onclick="saveCurrentPreset()" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-blue-700 active:scale-95">현재 설정 저장</button>
+                <button onclick="deleteSelectedPreset()" class="bg-white text-red-500 border border-red-200 px-3 py-1 rounded text-xs font-bold hover:bg-red-50 active:scale-95 ml-auto">삭제</button>
             </div>
 
-            <!-- 입력 그리드 (9컬럼 레이아웃) -->
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-3 mb-6 card p-5 bg-white/90 backdrop-blur shadow-sm text-center">
-                <div><label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">초기 자산 ($)</label><input type="number" id="seed" value="10000" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-sm text-center persist"></div>
-                <div><label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">수수료 (%)</label><input type="number" id="fee" value="0" step="0.01" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-sm text-center persist"></div>
-                <div><label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest text-center">분할수 (N)</label><input type="number" id="divN" value="5" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-sm text-center persist"></div>
-                <div><label class="block text-[10px] font-black text-blue-500 mb-1 uppercase tracking-widest text-center">매수 기준 (%)</label><input type="number" id="paramBuyP" value="1" step="0.1" class="w-full p-2 bg-blue-50 border border-blue-100 rounded-lg outline-none font-bold text-blue-700 text-sm text-center persist"></div>
-                <div><label class="block text-[10px] font-black text-orange-500 mb-1 uppercase tracking-widest text-center">매도 기준 (%)</label><input type="number" id="paramSellP" value="1" step="0.1" class="w-full p-2 bg-orange-50 border border-orange-100 rounded-lg outline-none font-bold text-orange-700 text-sm text-center persist"></div>
-                <div><label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest text-center text-center">만기일 (D)</label><input type="number" id="maxD" value="8" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-sm text-center persist"></div>
-                <div><label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">시작일</label><input type="date" id="startDate" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-xs text-center persist"></div>
-                <div><label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">종료일</label><input type="date" id="endDate" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-xs text-center persist"></div>
-                <div class="col-span-1 text-center"><button onclick="window.runBacktest()" class="w-full mt-5 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 transition-all active:scale-95 text-center text-center">분석 실행</button></div>
-            </div>
-
-            <!-- 요약 지표 (가로 9컬럼) -->
-            <div id="statsSection" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-3 mb-6 hidden animate-in fade-in text-center">
-                <div class="card p-4 stat-card border-blue-500 text-center text-xs"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">최종 자산</p><h3 id="statFinal" class="text-base font-black text-slate-800 tracking-tighter">$0</h3></div>
-                <div class="card p-4 stat-card border-emerald-500 text-center text-xs text-center"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">누적 수익률</p><h3 id="statReturn" class="text-base font-black text-emerald-600 tracking-tighter">0%</h3></div>
-                <div class="card p-4 stat-card border-indigo-500 text-center text-xs text-center"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">CAGR</p><h3 id="statCAGR" class="text-base font-black text-indigo-600 tracking-tighter">0%</h3></div>
-                <div class="card p-4 stat-card border-red-500 text-center text-xs text-center text-center text-center"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">MDD</p><h3 id="statMDD" class="text-base font-black text-red-500 tracking-tighter text-center">0%</h3></div>
-                <div class="card p-4 stat-card border-teal-500 text-center text-xs text-center text-center text-center"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Pain Index</p><h3 id="statPain" class="text-base font-black text-teal-600 tracking-tighter">0.00</h3></div>
-                <div class="card p-4 stat-card border-yellow-500 text-center text-xs text-center text-center"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">GPR</p><h3 id="statGPR" class="text-base font-black text-yellow-600 tracking-tighter">0.00</h3></div>
-                <div class="card p-4 stat-card border-purple-500 text-center text-xs text-center text-center"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Calmar</p><h3 id="statCalmar" class="text-base font-black text-purple-600 tracking-tighter">0.00</h3></div>
-                <div class="card p-4 stat-card border-orange-500 text-center text-xs text-center text-center text-center"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">승률</p><h3 id="statWinRate" class="text-base font-black text-orange-600 tracking-tighter">0%</h3></div>
-                <div class="card p-4 stat-card border-cyan-500 text-center text-xs text-center text-center text-center"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">PF</p><h3 id="statPF" class="text-base font-black text-cyan-600 tracking-tighter">0.00</h3></div>
-            </div>
-
-            <!-- 분석표 및 히트맵 -->
-            <div id="annualSection" class="hidden mb-6 card p-3 border-slate-200">
-                <div class="flex items-center gap-2 mb-2 ml-2"><svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg><h3 class="text-[11px] font-bold text-slate-700 uppercase tracking-wider">연도별 성과 분석</h3></div>
-                <div class="overflow-x-auto"><table class="w-full text-center compact-table"><thead class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-100"><tr><th>연도</th><th>시작 자산 ($)</th><th>종료 자산 ($)</th><th>연수익률 (%)</th><th class="text-red-500">Year MDD (%)</th><th>실현수익 ($)</th></tr></thead><tbody id="annualBody" class="divide-y divide-slate-50 font-medium text-slate-700"></tbody></table></div>
-            </div>
-
-            <div id="heatmapSection" class="hidden mb-6 card p-5 border-slate-200 overflow-hidden text-center">
-                <div class="flex items-center gap-2 mb-4 justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"></path></svg><h3 class="text-xs font-black text-slate-700 uppercase tracking-widest">Monthly Returns Heatmap (월별 수익률)</h3></div>
-                <div class="overflow-x-auto text-center"><table class="w-full heatmap-table border-collapse"><thead><tr class="border-b-2 border-slate-100"><th>Year</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th><th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th><th class="bg-slate-50 w-20">Annual</th></tr></thead><tbody id="heatmapBody"></tbody></table></div>
-            </div>
-
-            <!-- 메인 차트 -->
-            <div class="card p-6 relative min-h-[550px] shadow-lg mb-8">
-                <div id="loadingOverlay" class="absolute inset-0 bg-white/95 flex flex-col items-center justify-center z-20 rounded-lg hidden">
-                    <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4 mx-auto"></div>
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest animate-pulse">시뮬레이션 분석 중...</p>
+            <!-- 파라미터 입력 -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-3 mb-6 card p-5 text-center">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">초기 자산 ($)</label>
+                    <input type="number" id="seed" value="10000" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-sm text-center">
                 </div>
-                <div class="chart-container h-[500px]"><canvas id="equityChart"></canvas></div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">수수료 (%)</label>
+                    <input type="number" id="fee" value="0" step="0.01" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-sm text-center">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase">분할수 (N)</label>
+                    <input type="number" id="divN" value="5" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-sm text-center">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-blue-500 mb-1 uppercase">매수 기준 (%)</label>
+                    <input type="number" id="paramBuyP" value="1" step="0.1" class="w-full p-2 bg-blue-50 border border-blue-100 rounded-lg outline-none font-bold text-blue-700 text-sm text-center">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-orange-500 mb-1 uppercase">매도 기준 (%)</label>
+                    <input type="number" id="paramSellP" value="1" step="0.1" class="w-full p-2 bg-orange-50 border border-orange-100 rounded-lg outline-none font-bold text-orange-700 text-sm text-center">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase">만기일 (D)</label>
+                    <input type="number" id="maxD" value="8" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-sm text-center">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase">시작일</label>
+                    <input type="date" id="startDate" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-xs text-center">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase">종료일</label>
+                    <input type="date" id="endDate" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-xs text-center">
+                </div>
+                <div class="text-center">
+                    <button onclick="runBacktest()" class="w-full mt-5 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 active:scale-95">분석 실행</button>
+                </div>
             </div>
 
-            <!-- 상세 로그 -->
-            <div class="card overflow-hidden mb-12 shadow-sm text-center">
-                <div class="bg-slate-900 px-6 py-4 flex justify-between items-center text-white"><h3 class="font-black uppercase text-[10px] tracking-widest leading-none">일별 상세 거래 내역</h3><span id="logCount" class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Ready</span></div>
-                <div class="table-container"><table class="w-full text-left text-[11px] border-collapse"><thead class="sticky-th text-center"><tr class="uppercase text-[9px] font-black"><th>날짜</th><th class="text-right">종가 ($)</th><th class="text-right">등락 (%)</th><th class="text-right text-blue-400">매수량 (주)</th><th class="text-center text-blue-300">포트</th><th class="text-right text-yellow-300">평가액 ($)</th><th class="text-right text-emerald-300">실현수익 ($)</th><th class="text-center">상태</th><th class="text-right text-red-300">DD (%)</th></tr></thead><tbody id="tradeLog" class="divide-y divide-slate-100 bg-white text-slate-700 font-medium text-center"></tbody></table></div>
+            <!-- 요약 지표 -->
+            <div id="statsSection" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-3 mb-6 hidden text-center">
+                <div class="card p-4 stat-card border-blue-500 text-xs"><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">최종 자산</p><h3 id="statFinal" class="text-base font-black text-slate-800">$0</h3></div>
+                <div class="card p-4 stat-card border-emerald-500 text-xs"><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">누적 수익률</p><h3 id="statReturn" class="text-base font-black text-emerald-600">0%</h3></div>
+                <div class="card p-4 stat-card border-indigo-500 text-xs"><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">CAGR</p><h3 id="statCAGR" class="text-base font-black text-indigo-600">0%</h3></div>
+                <div class="card p-4 stat-card border-red-500 text-xs"><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">MDD</p><h3 id="statMDD" class="text-base font-black text-red-500">0%</h3></div>
+                <div class="card p-4 stat-card border-teal-500 text-xs"><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Pain Index</p><h3 id="statPain" class="text-base font-black text-teal-600">0.00</h3></div>
+                <div class="card p-4 stat-card border-yellow-500 text-xs"><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">GPR</p><h3 id="statGPR" class="text-base font-black text-yellow-600">0.00</h3></div>
+                <div class="card p-4 stat-card border-purple-500 text-xs"><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Calmar</p><h3 id="statCalmar" class="text-base font-black text-purple-600">0.00</h3></div>
+                <div class="card p-4 stat-card border-orange-500 text-xs"><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">승률</p><h3 id="statWinRate" class="text-base font-black text-orange-600">0%</h3></div>
+                <div class="card p-4 stat-card border-cyan-500 text-xs"><p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Profit Factor</p><h3 id="statPF" class="text-base font-black text-cyan-600">0.00</h3></div>
+            </div>
+
+            <!-- 연도별 성과 -->
+            <div id="annualSection" class="hidden mb-6 card p-3">
+                <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    <h3 class="text-[11px] font-bold text-slate-700 uppercase tracking-wider">연도별 성과 분석</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-center compact-table">
+                        <thead><tr class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-100">
+                            <th class="px-4 py-1.5">연도</th><th class="px-4 py-1.5">시작 자산 ($)</th><th class="px-4 py-1.5">종료 자산 ($)</th>
+                            <th class="px-4 py-1.5">연수익률 (%)</th><th class="px-4 py-1.5 text-red-500">Year MDD (%)</th><th class="px-4 py-1.5 text-emerald-600">실현수익 ($)</th>
+                        </tr></thead>
+                        <tbody id="annualBody" class="divide-y divide-slate-50 font-medium text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 히트맵 -->
+            <div id="heatmapSection" class="hidden mb-6 card p-5 overflow-hidden">
+                <div class="flex items-center gap-2 mb-4 justify-center">
+                    <h3 class="text-xs font-black text-slate-700 uppercase tracking-widest">Monthly Returns Heatmap</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full heatmap-table text-center border-collapse">
+                        <thead><tr class="border-b-2 border-slate-100">
+                            <th class="w-16">Year</th>
+                            <th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th>
+                            <th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th>
+                            <th class="bg-slate-50 w-20">Annual</th>
+                        </tr></thead>
+                        <tbody id="heatmapBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 차트 -->
+            <div class="mb-8 card p-6 relative min-h-[550px] shadow-lg">
+                <div class="h-[500px]"><canvas id="equityChart"></canvas></div>
+            </div>
+
+            <!-- 거래 로그 -->
+            <div class="card overflow-hidden mb-12 shadow-sm">
+                <div class="bg-slate-900 px-6 py-4 flex justify-between items-center text-white">
+                    <h3 class="font-black uppercase text-[10px] tracking-widest">일별 상세 거래 내역</h3>
+                    <span id="logCount" class="text-[10px] text-slate-400 font-bold uppercase">Ready</span>
+                </div>
+                <div class="table-container">
+                    <table class="w-full text-left text-[11px] border-collapse">
+                        <thead class="sticky-th">
+                            <tr class="uppercase text-[9px] font-black">
+                                <th class="px-3 py-3 border-b border-slate-700">날짜</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right">종가 ($)</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right">등락 (%)</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right text-blue-400">매수량 (주)</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-center text-blue-300">포트</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right text-yellow-300">평가액 ($)</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right text-emerald-300">실현수익 ($)</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-center">상태</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right text-red-300">DD (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tradeLog" class="divide-y divide-slate-100 bg-white text-slate-700 font-medium"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- 탭 2: 파라미터 최적화 -->
+        <!-- ══════════════ 최적화 탭 ══════════════ -->
         <div id="tabOptimize" class="hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <div class="card p-5 bg-gradient-to-br from-white to-slate-50 border-blue-100 lg:col-span-2 text-center">
-                    <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-4 italic text-center">최적화 파라미터 및 기간 설정</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">분할수 (N) 범위</label><div class="flex gap-1"><input type="number" id="optNMin" value="3" class="w-full p-2 border rounded text-center text-xs persist"><input type="number" id="optNMax" value="10" class="w-full p-2 border rounded text-center text-xs persist"></div></div>
-                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">매수 (P1%) 범위</label><div class="flex gap-1"><input type="number" id="optBuyMin" value="-1" step="0.1" class="w-full p-2 border rounded text-center text-xs persist"><input type="number" id="optBuyMax" value="2" step="0.1" class="w-full p-2 border rounded text-center text-xs persist"></div></div>
-                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">매도 (P2%) 범위</label><div class="flex gap-1"><input type="number" id="optSellMin" value="0.5" step="0.1" class="w-full p-2 border rounded text-center text-xs persist"><input type="number" id="optSellMax" value="4" step="0.1" class="w-full p-2 border rounded text-center text-xs persist"></div></div>
-                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">최대보유일(D) 범위</label><div class="flex gap-1"><input type="number" id="optDMin" value="4" class="w-full p-2 border rounded text-center text-xs persist"><input type="number" id="optDMax" value="20" class="w-full p-2 border rounded text-center text-xs persist"></div></div>
+                <div class="card p-5 bg-gradient-to-br from-white to-slate-50 lg:col-span-2">
+                    <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-4 italic">최적화 파라미터 및 기간 설정</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">분할수 (N) 범위</label>
+                            <div class="flex gap-1"><input type="number" id="optNMin" value="3" class="w-full p-2 border rounded text-center text-xs"><input type="number" id="optNMax" value="10" class="w-full p-2 border rounded text-center text-xs"></div></div>
+                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">매수 (P1%) 범위</label>
+                            <div class="flex gap-1"><input type="number" id="optBuyMin" value="-1" step="0.1" class="w-full p-2 border rounded text-center text-xs"><input type="number" id="optBuyMax" value="2" step="0.1" class="w-full p-2 border rounded text-center text-xs"></div></div>
+                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">매도 (P2%) 범위</label>
+                            <div class="flex gap-1"><input type="number" id="optSellMin" value="0.5" step="0.1" class="w-full p-2 border rounded text-center text-xs"><input type="number" id="optSellMax" value="4" step="0.1" class="w-full p-2 border rounded text-center text-xs"></div></div>
+                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">최대보유일(D) 범위</label>
+                            <div class="flex gap-1"><input type="number" id="optDMin" value="4" class="w-full p-2 border rounded text-center text-xs"><input type="number" id="optDMax" value="20" class="w-full p-2 border rounded text-center text-xs"></div></div>
                     </div>
-                    <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">최적화 시작일</label><input type="date" id="optStartDate" value="2014-01-01" class="w-full p-2 border rounded text-xs persist text-center"></div>
-                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center">최적화 종료일</label><input type="date" id="optEndDate" class="w-full p-2 border rounded text-xs persist text-center"></div>
-                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center">반복 횟수</label><input type="number" id="optIter" value="10000" class="w-full p-2 border border-blue-200 rounded font-bold text-blue-600 text-xs persist text-center"></div>
-                        <div class="flex items-end text-center"><button onclick="window.runOptimizer()" id="btnRunOptimizer" class="w-full bg-blue-600 text-white p-2.5 rounded-lg font-bold text-sm shadow-lg hover:bg-blue-700 transition-all active:scale-95">최적화 시작</button></div>
+                    <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">최적화 시작일</label>
+                            <input type="date" id="optStartDate" value="2014-01-01" class="w-full p-2 border rounded text-xs"></div>
+                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">최적화 종료일</label>
+                            <input type="date" id="optEndDate" class="w-full p-2 border rounded text-xs"></div>
+                        <div class="space-y-1"><label class="block text-[10px] font-bold text-slate-400 uppercase">반복 횟수</label>
+                            <input type="number" id="optIter" value="10000" class="w-full p-2 border border-blue-200 rounded text-center font-bold text-blue-600 text-xs"></div>
+                        <div class="flex items-end">
+                            <button onclick="runOptimizer()" id="btnRunOptimizer" class="w-full bg-blue-600 text-white p-2.5 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95">최적화 시작</button>
+                        </div>
                     </div>
                 </div>
-                <div class="card p-5 bg-white border-emerald-100 text-center">
-                    <h3 class="text-sm font-black text-emerald-600 uppercase tracking-widest mb-4 italic text-center">결과 필터링</h3>
-                    <div class="grid grid-cols-2 gap-4 text-center">
-                        <div class="space-y-1"><label class="block text-[9px] font-bold text-slate-400 uppercase text-center text-center">최소 CAGR (%)</label><input type="number" id="filterCAGR" value="30" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist"></div>
-                        <div class="space-y-1"><label class="block text-[9px] font-bold text-slate-400 uppercase text-center text-center">최대 MDD (%)</label><input type="number" id="filterMDD" value="40" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold text-red-500 persist"></div>
-                        <div class="space-y-1"><label class="block text-[9px] font-bold text-slate-400 uppercase text-center text-center">최소 Calmar</label><input type="number" id="filterCalmar" value="1.4" step="0.1" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist"></div>
-                        <div class="space-y-1"><label class="block text-[9px] font-bold text-slate-400 uppercase text-center text-center">최대 Pain Index</label><input type="number" id="filterPain" value="6" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist"></div>
+                <div class="card p-5">
+                    <h3 class="text-sm font-black text-emerald-600 uppercase tracking-widest mb-4 italic">결과 필터링</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1"><label class="block text-[9px] font-bold text-slate-400 uppercase">최소 CAGR (%)</label><input type="number" id="filterCAGR" value="30" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold"></div>
+                        <div class="space-y-1"><label class="block text-[9px] font-bold text-slate-400 uppercase">최대 MDD (%)</label><input type="number" id="filterMDD" value="40" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold text-red-500"></div>
+                        <div class="space-y-1"><label class="block text-[9px] font-bold text-slate-400 uppercase">최소 Calmar</label><input type="number" id="filterCalmar" value="1.4" step="0.1" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold"></div>
+                        <div class="space-y-1"><label class="block text-[9px] font-bold text-slate-400 uppercase">최대 Pain Index</label><input type="number" id="filterPain" value="6" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 진행률 표시 -->
-            <div id="optProgressSection" class="hidden mb-6 px-2 text-center">
+            <!-- 진행률 -->
+            <div id="optProgressSection" class="hidden mb-6">
                 <div class="flex justify-between text-[10px] font-bold text-blue-600 mb-1">
                     <span id="optProgressText">연산 진행률: 0%</span>
-                    <span id="optProgressDetail">0 / 0 (총조합수: 0)</span>
+                    <span id="optProgressDetail">0 / 0</span>
                 </div>
-                <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden border text-center"><div id="optProgressBar" class="progress-bar bg-blue-500 h-full w-0"></div></div>
+                <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                    <div id="optProgressBar" class="progress-bar bg-blue-500 h-full w-0"></div>
+                </div>
             </div>
 
             <!-- 리더보드 -->
-            <div class="card overflow-hidden text-center">
+            <div class="card overflow-hidden">
                 <div class="bg-slate-800 px-6 py-4 flex flex-col md:flex-row justify-between items-center text-white gap-4">
-                    <div class="flex flex-col text-left text-center"><h3 class="font-black uppercase text-[10px] tracking-widest">Optimization Leaderboard</h3><span id="optStatus" class="text-slate-400 text-[9px] font-normal uppercase mt-0.5">Idle</span></div>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2"><label class="text-[9px] font-bold text-slate-400 uppercase">1차 정렬:</label><select id="optSortCriteria" onchange="window.renderOptimizeTable()" class="bg-slate-700 text-white text-[10px] font-bold p-1 rounded outline-none border border-slate-600 text-center"><option value="calmar" selected>Calmar Ratio</option><option value="pf">Profit Factor</option><option value="cagr">CAGR</option><option value="mdd">MDD (낮은순)</option></select></div>
-                        <div class="flex items-center gap-2"><label class="text-[9px] font-bold text-slate-400 uppercase text-blue-300">2차 정렬:</label><select id="optSortCriteria2" onchange="window.renderOptimizeTable()" class="bg-slate-700 text-blue-300 text-[10px] font-bold p-1 rounded outline-none border border-blue-600/50"><option value="none">없음</option><option value="pf">Profit Factor</option><option value="cagr">CAGR</option><option value="mdd">MDD (낮은순)</option><option value="calmar">Calmar Ratio</option></select></div>
+                    <div>
+                        <h3 class="font-black uppercase text-[10px] tracking-widest">Optimization Leaderboard</h3>
+                        <span id="optStatus" class="text-slate-400 text-[9px] font-normal uppercase mt-0.5 block">Idle</span>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <label class="text-[9px] font-bold uppercase text-slate-400">1차 정렬:</label>
+                            <select id="optSortCriteria" onchange="renderOptimizeTable()" class="bg-slate-700 text-white text-[10px] font-bold p-1 rounded border border-slate-600">
+                                <option value="calmar" selected>Calmar Ratio</option>
+                                <option value="pf">Profit Factor</option>
+                                <option value="cagr">CAGR</option>
+                                <option value="gpr">GPR</option>
+                                <option value="mdd">MDD (낮은순)</option>
+                                <option value="pain">Pain Index (낮은순)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-[9px] font-bold uppercase text-slate-400">2차 정렬:</label>
+                            <select id="optSortCriteria2" onchange="renderOptimizeTable()" class="bg-slate-700 text-blue-300 text-[10px] font-bold p-1 rounded border border-blue-600/50">
+                                <option value="none">없음</option>
+                                <option value="pf">Profit Factor</option>
+                                <option value="cagr">CAGR</option>
+                                <option value="gpr">GPR</option>
+                                <option value="mdd">MDD (낮은순)</option>
+                                <option value="pain">Pain Index (낮은순)</option>
+                                <option value="calmar">Calmar Ratio</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div class="table-container text-center"><table class="w-full text-center text-[11px] border-collapse"><thead class="sticky-th text-white text-center"><tr class="uppercase text-[9px] font-black"><th>Rank</th><th>N</th><th>Buy%</th><th>Sell%</th><th>D</th><th class="text-emerald-300">CAGR</th><th class="text-red-300">MDD</th><th>Calmar Ratio</th><th>PF</th><th>적용 / 저장</th></tr></thead><tbody id="optBody" class="divide-y divide-slate-100 bg-white"></tbody></table></div>
+                <div class="table-container">
+                    <table class="w-full text-center text-[11px] border-collapse">
+                        <thead class="sticky-th">
+                            <tr class="uppercase text-[9px] font-black">
+                                <th class="px-4 py-3 border-b border-slate-700">Rank</th>
+                                <th class="px-2 py-3 border-b border-slate-700">N</th>
+                                <th class="px-2 py-3 border-b border-slate-700">Buy%</th>
+                                <th class="px-2 py-3 border-b border-slate-700">Sell%</th>
+                                <th class="px-2 py-3 border-b border-slate-700">D</th>
+                                <th class="px-4 py-3 border-b border-slate-700 text-emerald-300">CAGR</th>
+                                <th class="px-4 py-3 border-b border-slate-700 text-red-300">MDD</th>
+                                <th class="px-4 py-3 border-b border-slate-700 text-yellow-200">GPR</th>
+                                <th class="px-4 py-3 border-b border-slate-700 text-purple-200">Calmar</th>
+                                <th class="px-4 py-3 border-b border-slate-700 text-slate-400">Pain</th>
+                                <th class="px-4 py-3 border-b border-slate-700 bg-slate-700 text-yellow-400">PF</th>
+                                <th class="px-4 py-3 border-b border-slate-700">적용 / 저장</th>
+                            </tr>
+                        </thead>
+                        <tbody id="optBody" class="divide-y divide-slate-100 bg-white">
+                            <tr><td colspan="12" class="py-20 text-slate-300 italic font-medium">설정 확인 후 최적화를 실행하세요.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-
-        <input type="hidden" id="csvUrl">
     </div>
 
-    <!-- 로직 스크립트 -->
-    <script>
-        const APP_ID = '3day-strategy-final-v3';
-        let equityChart = null, cachedData = null, maxDataPrecision = 2;
-        window.optimizationResults = [];
-        const TARGET_SHEET_ID = "1CY8hVPAXfPZZOfBgTaU5ygeLg4OXR14So_6dhfyoJjs";
-        const DEFAULT_URL = `https://docs.google.com/spreadsheets/d/${TARGET_SHEET_ID}/export?format=csv&gid=0`;
+<script>
+// ═══════════════════════════════════════════════════════════
+//  PRESET + AUTO-SAVE  (동파법 방식: prompt + 객체 키)
+// ═══════════════════════════════════════════════════════════
+const LS_PRESETS = 'soxl_presets';
+const LS_INPUTS  = 'soxl_inputs';
+const INPUT_IDS  = ['seed','fee','divN','paramBuyP','paramSellP','maxD','startDate','endDate'];
 
-        function roundTo(val, p) { 
-            const f = Math.pow(10, p); 
-            return Math.round(val * f) / f; 
+// 현재 입력값 수집
+function collectInputs() {
+    const d = {};
+    INPUT_IDS.forEach(id => { d[id] = document.getElementById(id).value; });
+    return d;
+}
+
+// 입력값 적용 (동파법의 applyPresetToUI 와 동일)
+function applyInputs(settings) {
+    for (const key in settings) {
+        const el = document.getElementById(key);
+        if (el && settings[key] !== undefined) el.value = settings[key];
+    }
+}
+
+// 자동 저장 (동파법의 saveSettings 와 동일)
+function saveInputs() {
+    localStorage.setItem(LS_INPUTS, JSON.stringify(collectInputs()));
+}
+
+// 자동 불러오기 (동파법의 loadSettings 와 동일)
+function loadInputs() {
+    try {
+        const d = JSON.parse(localStorage.getItem(LS_INPUTS) || '{}');
+        if (Object.keys(d).length) applyInputs(d);
+    } catch {}
+}
+
+// ── 프리셋 저장 (동파법과 완전히 동일: prompt + 객체 키)
+function saveCurrentPreset() {
+    const name = prompt('프리셋 이름을 입력하세요:');
+    if (!name || !name.trim()) return;
+    const presets = JSON.parse(localStorage.getItem(LS_PRESETS) || '{}');
+    presets[name.trim()] = collectInputs();
+    localStorage.setItem(LS_PRESETS, JSON.stringify(presets));
+    updatePresetUI();
+    toast(`'${name.trim()}' 프리셋이 저장되었습니다`);
+}
+
+// ── 프리셋 불러오기 (동파법의 loadPreset 와 동일)
+function loadSelectedPreset() {
+    const name = document.getElementById('presetSelect').value;
+    if (!name) { toast('불러올 프리셋을 선택하세요', '#94a3b8'); return; }
+    const presets = JSON.parse(localStorage.getItem(LS_PRESETS) || '{}');
+    if (presets[name]) {
+        applyInputs(presets[name]);
+        saveInputs();
+        clearBacktestResults();
+        switchTab('backtest');
+        toast(`'${name}' 설정을 불러왔습니다`);
+    }
+}
+
+// ── 프리셋 삭제 (동파법의 deletePreset 와 동일)
+function deleteSelectedPreset() {
+    const name = document.getElementById('presetSelect').value;
+    if (!name) { toast('삭제할 프리셋을 선택하세요', '#94a3b8'); return; }
+    if (!confirm(`'${name}' 프리셋을 삭제할까요?`)) return;
+    const presets = JSON.parse(localStorage.getItem(LS_PRESETS) || '{}');
+    delete presets[name];
+    localStorage.setItem(LS_PRESETS, JSON.stringify(presets));
+    updatePresetUI();
+    toast('삭제 완료', '#ef4444');
+}
+
+// ── select 목록 갱신 (동파법의 updatePresetUI 와 동일)
+function updatePresetUI() {
+    const select = document.getElementById('presetSelect');
+    const presets = JSON.parse(localStorage.getItem(LS_PRESETS) || '{}');
+    while (select.options.length > 1) select.remove(1);
+    Object.keys(presets).forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name; opt.textContent = name;
+        select.appendChild(opt);
+    });
+}
+
+// ── 최적화 결과 → 프리셋 저장
+function saveOptResultAsPreset(N, BuyP, SellP, D, startDate, endDate) {
+    const name = prompt('프리셋 이름을 입력하세요:');
+    if (!name || !name.trim()) return;
+    const presets = JSON.parse(localStorage.getItem(LS_PRESETS) || '{}');
+    presets[name.trim()] = {
+        seed:      document.getElementById('seed').value,
+        fee:       document.getElementById('fee').value,
+        divN:      N, paramBuyP: BuyP, paramSellP: SellP, maxD: D,
+        startDate: startDate, endDate: endDate
+    };
+    localStorage.setItem(LS_PRESETS, JSON.stringify(presets));
+    updatePresetUI();
+    toast(`'${name.trim()}' 프리셋이 저장되었습니다`);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════
+let _toastTimer;
+function toast(msg, color='#10b981') {
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.style.background = color;
+    el.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CORE
+// ═══════════════════════════════════════════════════════════
+let equityChart = null;
+let cachedData  = null;
+let maxDataPrecision = 2;
+let optimizationResults = [];
+
+const SHEET_ID  = '1CY8hVPAXfPZZOfBgTaU5ygeLg4OXR14So_6dhfyoJjs';
+const CSV_URL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+
+window.onload = async function() {
+    loadInputs();
+    updatePresetUI();
+
+    INPUT_IDS.forEach(id => {
+        document.getElementById(id).addEventListener('change', saveInputs);
+    });
+
+    await loadData();
+};
+
+function switchTab(tab) {
+    ['backtest','optimize'].forEach(t => {
+        document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== tab);
+        document.getElementById('btnTab'  + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('tab-active', t === tab);
+    });
+}
+
+function roundTo(v, p) { const f = Math.pow(10,p); return Math.round(v*f)/f; }
+
+async function loadData() {
+    try {
+        const res  = await fetch(`${CSV_URL}&t=${Date.now()}`);
+        const text = await res.text();
+        const lines = text.split(/\r?\n/).filter(l => l.trim());
+        let data = [], maxDp = 0;
+
+        lines.forEach(line => {
+            const cols = line.split(',').map(c => c.replace(/"/g,'').trim());
+            if (cols.length < 2) return;
+            const d = new Date(cols[0]);
+            const raw = cols[1];
+            const v = parseFloat(raw);
+            if (isNaN(d.getTime()) || isNaN(v)) return;
+            if (raw.includes('.')) maxDp = Math.max(maxDp, raw.split('.')[1].length);
+            data.push({ dateObj: d, dateStr: d.toISOString().split('T')[0], close: v, rawClose: raw });
+        });
+
+        data.sort((a,b) => a.dateObj - b.dateObj);
+        cachedData = data;
+        maxDataPrecision = maxDp;
+
+        document.getElementById('dataPeriodDisplay').innerText =
+            `SOXL 데이터 준비됨: ${data[0].dateStr} ~ ${data[data.length-1].dateStr}`;
+        document.getElementById('dataStatusDot').classList.replace('bg-slate-300','bg-emerald-500');
+
+        const lastDate = data[data.length-1].dateStr;
+        if (!document.getElementById('startDate').value) document.getElementById('startDate').value = '2021-01-01';
+        if (!document.getElementById('endDate').value)   document.getElementById('endDate').value   = lastDate;
+        if (!document.getElementById('optEndDate').value) document.getElementById('optEndDate').value = lastDate;
+    } catch(e) {
+        console.error(e);
+        document.getElementById('dataPeriodDisplay').innerText = '데이터 로드 실패 (CORS 또는 네트워크 오류)';
+    }
+}
+
+function runSimulation(params, marketData, allData) {
+    const { seed, fee, N, BuyP, SellP, D } = params;
+    const p = maxDataPrecision + 2;
+    const Kb = 1 + BuyP/100, Ks = 1 + SellP/100;
+    let cash = seed, holdings = [], history = [], dds = [], logs = [];
+    let peak = seed, mdd = 0, trades = 0, wins = 0, losses = 0, gProfit = 0, gLoss = 0;
+
+    const gStart = allData.findIndex(d => d.dateStr === marketData[0].dateStr);
+
+    for (let i = 0; i < marketData.length; i++) {
+        const today = marketData[i];
+        const gi = gStart + i;
+        const prev = allData[gi-1], prev2 = allData[gi-2];
+        let buyLim = -1, sellLim = 999999, refP = 0;
+
+        if (prev && prev2) {
+            const s = prev.close + prev2.close;
+            buyLim  = roundTo(s * Kb / (3 - Kb), p);
+            sellLim = roundTo(s * Ks / (3 - Ks), p);
+            const r = BuyP/100;
+            refP = roundTo(s * (1+r) / (2-r), p);
         }
 
-        window.onload = function() {
-            loadSavedInputs();
-            renderPresetSelect();
-            loadInitialData();
-        };
+        let event = '관망', bought = 0, realized = 0;
 
-        async function loadInitialData() {
-            const display = document.getElementById('dataPeriodDisplay');
-            const dot = document.getElementById('dataStatusDot');
-            try {
-                const res = await fetch(`${DEFAULT_URL}&t=${Date.now()}`);
-                if (!res.ok) throw new Error("HTTP Status " + res.status);
-                const txt = await res.text();
-                const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-                
-                let allData = [], maxP = 0;
-                for (let i = 0; i < lines.length; i++) {
-                    const cols = lines[i].split(',').map(c => c.replace(/^["']|["']$/g, '').trim());
-                    if (cols.length < 2) continue;
-                    const dateObj = new Date(cols[0]);
-                    const val = parseFloat(cols[1]);
-                    if (!isNaN(dateObj.getTime()) && !isNaN(val)) {
-                        if (cols[1].includes('.')) maxP = Math.max(maxP, cols[1].split('.')[1].length);
-                        allData.push({ dateObj, dateStr: dateObj.toISOString().split('T')[0], close: val, rawClose: cols[1] });
-                    }
-                }
-                
-                maxDataPrecision = maxP;
-                allData.sort((a, b) => a.dateObj - b.dateObj);
-                cachedData = allData;
-                
-                display.innerText = `SOXL 데이터 준비됨: ${allData[0].dateStr} ~ ${allData[allData.length-1].dateStr}`;
-                dot.classList.replace('bg-slate-300', 'bg-emerald-500');
-                dot.classList.remove('animate-pulse');
-
-                const lastDate = allData[allData.length-1].dateStr;
-                
-                // [수정] 기본 시작일을 2014-01-01로 설정
-                if(!document.getElementById('startDate').value) document.getElementById('startDate').value = "2014-01-01";
-                if(!document.getElementById('optStartDate').value) document.getElementById('optStartDate').value = "2014-01-01";
-                
-                // 종료일은 마지막 데이터 날짜로
-                if(!document.getElementById('endDate').value) document.getElementById('endDate').value = lastDate;
-                if(!document.getElementById('optEndDate').value) document.getElementById('optEndDate').value = lastDate;
-                
-            } catch (err) {
-                display.innerText = `로드 실패: ${err.message}`;
-                dot.classList.replace('bg-slate-300', 'bg-red-500');
+        if (holdings.length > 0) {
+            const sellOk   = today.close >= sellLim;
+            const expireOk = gi - holdings[0].gbi >= D;
+            if (sellOk || expireOk) {
+                const qty  = holdings.reduce((s,h)=>s+h.qty, 0);
+                const cost = holdings.reduce((s,h)=>s+h.cost, 0);
+                const proc = roundTo(qty * today.close * (1-fee), p);
+                realized = roundTo(proc - cost, p);
+                if (realized > 0) { wins++;   gProfit += realized; event = sellOk ? '전량익절' : '만기익절'; }
+                else              { losses++; gLoss   += Math.abs(realized); event = sellOk ? '전량매도(손실)' : '만기손절'; }
+                cash = roundTo(cash + proc, p);
+                holdings = []; trades++;
             }
         }
 
-        // --- LocalStorage 기반 저장/불러오기 ---
-        function saveAllInputs() {
-            const data = {};
-            document.querySelectorAll('.persist').forEach(el => { data[el.id] = el.value; });
-            localStorage.setItem(`${APP_ID}_last_inputs`, JSON.stringify(data));
-            showIndicator("Settings Saved");
-        }
-
-        function loadSavedInputs() {
-            const saved = localStorage.getItem(`${APP_ID}_last_inputs`);
-            if (saved) {
-                const data = JSON.parse(saved);
-                Object.keys(data).forEach(id => { const el = document.getElementById(id); if (el) el.value = data[id]; });
-            }
-        }
-
-        function getPresets() { return JSON.parse(localStorage.getItem(`${APP_ID}_presets`) || "[]"); }
-
-        function renderPresetSelect() {
-            const select = document.getElementById('presetSelect');
-            const presets = getPresets();
-            while (select.options.length > 1) { select.remove(1); }
-            presets.sort((a, b) => b.createdAt - a.createdAt).forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id; opt.textContent = p.name; select.appendChild(opt);
-            });
-        }
-
-        window.loadSelectedPreset = function() {
-            const id = parseInt(document.getElementById('presetSelect').value);
-            const p = getPresets().find(item => item.id === id);
-            if (p) { window.applyPresetToUI(p); showIndicator("Preset Loaded"); }
-        };
-
-        window.deleteSelectedPreset = function() {
-            const id = parseInt(document.getElementById('presetSelect').value);
-            if (id && confirm("삭제하시겠습니까?")) {
-                const presets = getPresets().filter(p => p.id !== id);
-                localStorage.setItem(`${APP_ID}_presets`, JSON.stringify(presets));
-                renderPresetSelect(); document.getElementById('presetSelect').value = "";
-            }
-        };
-
-        window.openPresetModal = function(idx = null) {
-            const overlay = document.getElementById('modalOverlay'), input = document.getElementById('presetNameInput');
-            overlay.style.display = 'flex'; input.value = ""; input.focus();
-            document.getElementById('confirmSavePreset').onclick = function() {
-                const name = input.value.trim(); if (!name) return;
-                let params;
-                if (idx !== null) {
-                    const r = window.optimizationResults[idx];
-                    params = { N: r.N, BuyP: r.BuyP, SellP: r.SellP, D: r.D };
-                } else {
-                    params = { N: document.getElementById('divN').value, BuyP: document.getElementById('paramBuyP').value, SellP: document.getElementById('paramSellP').value, D: document.getElementById('maxD').value };
-                }
-                const presets = getPresets();
-                presets.push({ id: Date.now(), name, ...params, createdAt: Date.now() });
-                localStorage.setItem(`${APP_ID}_presets`, JSON.stringify(presets));
-                renderPresetSelect(); window.closePresetModal(); showIndicator("Preset Saved");
-            };
-        };
-
-        window.closePresetModal = function() { document.getElementById('modalOverlay').style.display = 'none'; };
-
-        window.applyPresetToUI = function(p) {
-            document.getElementById('divN').value = p.N || 5;
-            document.getElementById('paramBuyP').value = p.BuyP || 1;
-            document.getElementById('paramSellP').value = p.SellP || 1;
-            document.getElementById('maxD').value = p.D || 8;
-            window.clearBacktestResults();
-            window.switchTab('backtest');
-        };
-
-        function showIndicator(txt) {
-            const ind = document.getElementById('saveIndicator');
-            ind.innerText = txt; ind.style.display = 'block';
-            setTimeout(() => { ind.style.display = 'none'; }, 2000);
-        }
-
-        window.switchTab = function(tab) {
-            document.getElementById('tabBacktest').classList.toggle('hidden', tab !== 'backtest');
-            document.getElementById('tabOptimize').classList.toggle('hidden', tab !== 'optimize');
-            document.getElementById('btnTabBacktest').classList.toggle('tab-active', tab === 'backtest');
-            document.getElementById('btnTabOptimize').classList.toggle('tab-active', tab === 'optimize');
-        };
-
-        window.applyParams = function(idx) {
-            const r = window.optimizationResults[idx];
-            if (!r) return;
-            document.getElementById('divN').value = r.N; 
-            document.getElementById('paramBuyP').value = r.BuyP;
-            document.getElementById('paramSellP').value = r.SellP; 
-            document.getElementById('maxD').value = r.D;
-            window.clearBacktestResults();
-            window.switchTab('backtest');
-        };
-
-        function runSimulation(params, marketData, allFullData, isOpt = false) {
-            const { seed, fee, N, BuyP, SellP, D } = params;
-            const calcP = maxDataPrecision + 2;
-            let cash = seed, holdings = [], history = [], strategyDrawdowns = [], dailyLogs = [];
-            let maxEquity = seed, mdd = 0, tradeCount = 0, wins = 0, losses = 0, totalProfit = 0, totalLoss = 0;
-            const globalStartIndex = allFullData.findIndex(d => d.dateStr === marketData[0].dateStr);
-
-            for (let i = 0; i < marketData.length; i++) {
-                const today = marketData[i], gIdx = globalStartIndex + i, prev = allFullData[gIdx - 1], prev2 = allFullData[gIdx - 2];
-                let buyLimit = -1, sellLimit = 999999, refPrice = 0;
-                if (prev && prev2) {
-                    const sum = prev.close + prev2.close;
-                    buyLimit = roundTo((sum * (1 + BuyP/100)) / (3 - (1 + BuyP/100)), calcP);
-                    sellLimit = roundTo((sum * (1 + SellP/100)) / (3 - (1 + SellP/100)), calcP);
-                    refPrice = roundTo((sum * (1 + BuyP/100)) / (2 - BuyP/100), calcP);
-                }
-                let event = "관망", unitsBought = 0, realized = 0;
-                if (holdings.length > 0) {
-                    const isProfit = (today.close >= sellLimit), isExpired = (gIdx - holdings[0].gIdx >= D);
-                    if (isProfit || isExpired) {
-                        const qty = holdings.reduce((s, h) => s + h.qty, 0), cost = holdings.reduce((s, h) => s + h.cost, 0);
-                        const proceeds = roundTo((qty * today.close) * (1 - fee), calcP);
-                        realized = roundTo(proceeds - cost, calcP);
-                        if (realized > 0) { wins++; totalProfit += realized; event = isProfit ? "전량익절" : "만기익절"; }
-                        else { losses++; totalLoss += Math.abs(realized); event = isProfit ? "전량매도(손)" : "만기손절"; }
-                        cash = roundTo(cash + proceeds, calcP); holdings = []; tradeCount++;
-                    }
-                }
-                if (holdings.length < N && !event.includes("매도") && !event.includes("절")) {
-                    let buyTrig = (holdings.length === 0) ? (prev && today.close < prev.close) : (buyLimit > 0 && today.close <= buyLimit);
-                    if (buyTrig) {
-                        const budget = cash / (N - holdings.length);
-                        const qty = Math.floor(budget / ((refPrice > 0 ? refPrice : today.close) * (1 + fee)));
-                        if (qty > 0) {
-                            const cost = roundTo(qty * today.close * (1 + fee), calcP);
-                            cash = roundTo(cash - cost, calcP); holdings.push({ qty, price: today.close, cost, gIdx });
-                            unitsBought = qty; event = (event === "관망") ? "매수" : event + "&매수";
-                        }
-                    }
-                }
-                const currentEq = roundTo(cash + (holdings.reduce((s, h) => s + h.qty, 0) * today.close), calcP);
-                if (currentEq > maxEquity) maxEquity = currentEq;
-                const dd = ((maxEquity - currentEq) / maxEquity) * 100;
-                if (dd > mdd) mdd = dd;
-                if (!isOpt) { history.push(currentEq); strategyDrawdowns.push(-dd); dailyLogs.push({ date: today.dateStr, close: today.close, rawClose: today.rawClose, change: prev ? ((today.close-prev.close)/prev.close*100) : 0, bought: unitsBought, port: `${holdings.length}/${N}`, equity: currentEq, realized, event, dd }); }
-            }
-            const finalVal = !isOpt ? history[history.length-1] : cash;
-            const diffY = Math.max((new Date(marketData[marketData.length - 1].dateStr) - new Date(marketData[0].dateStr)) / (1000 * 60 * 60 * 24 * 365.25), 0.1);
-            const cagr = (Math.pow(finalVal / seed, 1 / diffY) - 1) * 100;
-            const pf = totalLoss !== 0 ? (totalProfit / totalLoss) : (totalProfit > 0 ? 99 : 0);
-            return { finalVal, cagr, mdd, pf, calmar: mdd !== 0 ? cagr / mdd : 0, painIndex: !isOpt ? (strategyDrawdowns.reduce((s, v) => s + Math.abs(v), 0) / marketData.length) : 0, winRate: tradeCount > 0 ? (wins/tradeCount)*100 : 0, history, strategyDrawdowns, dailyLogs, labels: marketData.map(d => d.dateStr), prices: marketData.map(d => d.close) };
-        }
-
-        window.runBacktest = () => {
-            if (!cachedData) return; saveAllInputs();
-            const start = document.getElementById('startDate').value, end = document.getElementById('endDate').value;
-            const marketData = cachedData.filter(d => (!start || d.dateStr >= start) && (!end || d.dateStr <= end));
-            if (marketData.length < 5) return;
-            const params = { seed: parseFloat(document.getElementById('seed').value), fee: parseFloat(document.getElementById('fee').value)/100, N: parseInt(document.getElementById('divN').value), BuyP: parseFloat(document.getElementById('paramBuyP').value), SellP: parseFloat(document.getElementById('paramSellP').value), D: parseInt(document.getElementById('maxD').value) };
-            const res = runSimulation(params, marketData, cachedData, false);
-            displayBacktestDetailed(res, params);
-        };
-
-        function displayBacktestDetailed(res, params) {
-            document.getElementById('statsSection').classList.remove('hidden');
-            document.getElementById('annualSection').classList.remove('hidden');
-            document.getElementById('heatmapSection').classList.remove('hidden');
-            document.getElementById('statFinal').innerText = '$' + res.finalVal.toLocaleString(undefined, {maximumFractionDigits:0});
-            document.getElementById('statReturn').innerText = `${(((res.finalVal-params.seed)/params.seed)*100).toFixed(0)}%`;
-            document.getElementById('statCAGR').innerText = res.cagr.toFixed(2) + '%';
-            document.getElementById('statMDD').innerText = `-${res.mdd.toFixed(2)}%`;
-            document.getElementById('statWinRate').innerText = res.winRate.toFixed(1) + '%';
-            document.getElementById('statCalmar').innerText = res.calmar.toFixed(2);
-            document.getElementById('statPF').innerText = res.pf.toFixed(2);
-            document.getElementById('statPain').innerText = (res.painIndex || 0).toFixed(2);
-            document.getElementById('statGPR').innerText = res.painIndex !== 0 ? (res.cagr / res.painIndex).toFixed(2) : '0.00';
-
-            let years = {}, monthlyMap = {};
-            res.dailyLogs.forEach(l => {
-                const y = l.date.substring(0, 4), m = parseInt(l.date.substring(5, 7));
-                if (!years[y]) years[y] = { eq: 0, rel: 0, peak: 0, mdd: 0 };
-                years[y].eq = l.equity; years[y].rel += l.realized;
-                if (l.equity > years[y].peak) years[y].peak = l.equity;
-                const currentDD = ((years[y].peak - l.equity) / years[y].peak) * 100;
-                if (currentDD > years[y].mdd) years[y].mdd = currentDD;
-                if (!monthlyMap[y]) monthlyMap[y] = {}; monthlyMap[y][m] = l.equity;
-            });
-            let prevEq = params.seed;
-            document.getElementById('annualBody').innerHTML = Object.keys(years).sort().map(y => {
-                const ret = ((years[y].eq - prevEq) / prevEq) * 100;
-                const html = `<tr><td class="px-4 py-1.5 font-bold">${y}</td><td class="px-4 py-1.5 text-xs text-center">$${prevEq.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-semibold text-xs text-center">$${years[y].eq.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-bold ${ret>=0?'text-red-600':'text-blue-600'} text-center">${ret.toFixed(2)}%</td><td class="px-4 py-1.5 text-blue-500 font-bold text-center">-${years[y].mdd.toFixed(2)}%</td><td class="px-4 py-1.5 font-bold text-xs text-center">$${years[y].rel.toLocaleString(undefined,{maximumFractionDigits:0})}</td></tr>`;
-                prevEq = years[y].eq; return html;
-            }).join('');
-
-            let rollingPrev = params.seed;
-            document.getElementById('heatmapBody').innerHTML = Object.keys(years).sort().map(y => {
-                let row = `<tr class="border-b border-slate-50 text-center"><td class="bg-slate-50 font-black text-slate-900 text-[11px] text-center">${y}</td>`;
-                let yStart = rollingPrev;
-                for (let m = 1; m <= 12; m++) {
-                    const mEnd = monthlyMap[y][m];
-                    if (mEnd) {
-                        const mRet = ((mEnd - rollingPrev) / rollingPrev) * 100;
-                        let bg = mRet > 0 ? `rgba(239, 68, 68, ${Math.min(mRet/10+0.1, 1)})` : mRet < 0 ? `rgba(16, 185, 129, ${Math.min(Math.abs(mRet)/10+0.1, 1)})` : 'transparent';
-                        row += `<td style="background-color:${bg}; color:${Math.abs(mRet)>5?'white':'#1e293b'}" class="text-[10px] font-bold text-center">${mRet.toFixed(1)}%</td>`;
-                        rollingPrev = mEnd;
-                    } else row += `<td class="text-slate-200 text-center">-</td>`;
-                }
-                const aRet = ((years[y].eq - yStart) / yStart) * 100;
-                row += `<td class="bg-slate-50 font-black ${aRet>=0?'text-red-600':'text-blue-600'} text-center">${aRet.toFixed(1)}%</td></tr>`;
-                return row;
-            }).join('');
-
-            if (equityChart) equityChart.destroy();
-            equityChart = new Chart(document.getElementById('equityChart').getContext('2d'), {
-                type: 'line',
-                data: { labels: res.labels, datasets: [
-                    { label: 'MDD (%)', data: res.strategyDrawdowns, fill: true, backgroundColor: 'rgba(239, 68, 68, 0.08)', borderColor: 'transparent', pointRadius: 0, yAxisID: 'yMDD' },
-                    { label: 'SOXL 종가 ($)', data: res.prices, borderColor: 'rgba(148, 163, 184, 0.4)', borderWidth: 1, pointRadius: 0, yAxisID: 'yPrice' },
-                    { label: '전략 자산 ($)', data: res.history, borderColor: '#2563eb', borderWidth: 2.5, pointRadius: 0, yAxisID: 'y' }
-                ]},
-                options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, scales: { y: { position: 'left', ticks: { font: { size: 9 } } }, yPrice: { position: 'left', grid: { display: false }, ticks: { font: { size: 9 } } }, yMDD: { position: 'right', min: -100, max: 0, grid: { display: false }, ticks: { font: { size: 8 }, color: '#ef4444' } } } }
-            });
-
-            document.getElementById('tradeLog').innerHTML = res.dailyLogs.slice().reverse().map(l => {
-                let cls = l.event.includes('익절') ? 'bg-red-600 text-white' : l.event.includes('손') ? 'bg-blue-600 text-white' : l.event.includes('매수') ? 'bg-slate-700 text-white' : 'text-slate-400';
-                return `<tr class="hover:bg-slate-50 border-b text-center"><td class="px-3 py-2 text-left font-mono text-xs">${l.date}</td><td class="px-3 py-2 text-right font-mono text-xs">$${l.rawClose}</td><td class="px-3 py-2 text-right font-bold text-xs ${l.change>=0?'text-red-600':'text-blue-600'}">${l.change.toFixed(2)}%</td><td class="px-3 py-2 text-right text-xs">${l.bought||'-'}</td><td class="px-3 py-2 text-center text-xs font-bold text-slate-500">${l.port}</td><td class="px-3 py-2 text-right text-xs font-bold">$${l.equity.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td class="px-3 py-2 text-right text-xs font-black ${l.realized>0?'text-red-600':l.realized<0?'text-blue-600':''}">${l.realized?l.realized.toLocaleString():'-'}</td><td class="px-3 py-2 text-center text-center"><span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${cls}">${l.event}</span></td><td class="px-3 py-2 text-right text-xs font-bold text-red-400">${l.dd.toFixed(2)}%</td></tr>`;
-            }).join('');
-            document.getElementById('logCount').innerText = `${res.dailyLogs.length} 거래일 기록 완료`;
-        }
-
-        window.runOptimizer = async function() {
-            if (!cachedData) return; saveAllInputs();
-            const start = document.getElementById('optStartDate').value, end = document.getElementById('optEndDate').value;
-            const marketData = cachedData.filter(d => (!start || d.dateStr >= start) && (!end || d.dateStr <= end));
-            const iters = parseInt(document.getElementById('optIter').value);
-            const ranges = { n:[parseInt(document.getElementById('optNMin').value), parseInt(document.getElementById('optNMax').value)], buy:[parseFloat(document.getElementById('optBuyMin').value), parseFloat(document.getElementById('optBuyMax').value)], sell:[parseFloat(document.getElementById('optSellMin').value), parseFloat(document.getElementById('optSellMax').value)], d:[parseInt(document.getElementById('optDMin').value), parseInt(document.getElementById('optDMax').value)] };
-            const filters = { cagr: parseFloat(document.getElementById('filterCAGR').value), mdd: parseFloat(document.getElementById('filterMDD').value), calmar: parseFloat(document.getElementById('filterCalmar').value) };
-            const btn = document.getElementById('btnRunOptimizer'), progress = document.getElementById('optProgressSection'), bar = document.getElementById('optProgressBar'), detail = document.getElementById('optProgressDetail'), pText = document.getElementById('optProgressText');
-            
-            const totalComb = (ranges.n[1]-ranges.n[0]+1) * (Math.round((ranges.buy[1]-ranges.buy[0])*10)+1) * (Math.round((ranges.sell[1]-ranges.sell[0])*10)+1) * (ranges.d[1]-ranges.d[0]+1);
-            btn.disabled = true; progress.classList.remove('hidden'); window.optimizationResults = [];
-            
-            for (let i = 0; i < iters; i++) {
-                const N = Math.floor(Math.random() * (ranges.n[1] - ranges.n[0] + 1)) + ranges.n[0], BuyP = parseFloat((Math.floor(Math.random() * ((ranges.buy[1] - ranges.buy[0]) * 10 + 1)) / 10 + ranges.buy[0]).toFixed(1)), SellP = parseFloat((Math.floor(Math.random() * ((ranges.sell[1] - ranges.sell[0]) * 10 + 1)) / 10 + ranges.sell[0]).toFixed(1)), D = Math.floor(Math.random() * (ranges.d[1] - ranges.d[0] + 1)) + ranges.d[0];
-                const res = runSimulation({ seed:10000, fee:0, N, BuyP, SellP, D }, marketData, cachedData, true);
-                if (res.cagr >= filters.cagr && res.mdd <= filters.mdd && res.calmar >= filters.calmar) { window.optimizationResults.push({ N, BuyP, SellP, D, ...res, startDate: start, endDate: end }); }
-                if (i % 100 === 0) { 
-                    const pct = Math.round((i / iters) * 100);
-                    bar.style.width = pct + '%'; 
-                    pText.innerText = `${pct}%`; 
-                    detail.innerText = `${i} / ${iters} (총조합수: ${totalComb.toLocaleString()})`; await new Promise(r => setTimeout(r, 0)); 
+        if (holdings.length < N && !event.includes('매도') && !event.includes('절')) {
+            const trigger = holdings.length === 0
+                ? (prev && today.close < prev.close)
+                : (buyLim > 0 && today.close <= buyLim);
+            if (trigger) {
+                const slots = N - holdings.length;
+                const budget = cash / slots;
+                const dp = refP > 0 ? refP : today.close;
+                const qty = Math.floor(budget / (dp * (1+fee)));
+                if (qty > 0) {
+                    const cost = roundTo(qty * today.close * (1+fee), p);
+                    cash = roundTo(cash - cost, p);
+                    holdings.push({ qty, cost, gbi: gi });
+                    bought = qty;
+                    event = event === '관망' ? '매수' : event + '&매수';
                 }
             }
-            bar.style.width = '100%'; pText.innerText = '100%'; detail.innerText = `${iters} / ${iters} (총조합수: ${totalComb.toLocaleString()}) 완료`; window.renderOptimizeTable(); btn.disabled = false;
-        };
+        }
 
-        window.renderOptimizeTable = function() {
-            const c1 = document.getElementById('optSortCriteria').value, c2 = document.getElementById('optSortCriteria2').value, optBody = document.getElementById('optBody');
-            const getComp = (c) => (a,b) => c === 'mdd' ? a[c]-b[c] : b[c]-a[c];
-            window.optimizationResults.sort(getComp(c1));
-            let finalSelection = window.optimizationResults.slice(0, 30);
-            if (c2 !== 'none') finalSelection.sort(getComp(c2));
+        const hQty = holdings.reduce((s,h)=>s+h.qty, 0);
+        const eq   = roundTo(cash + hQty * today.close, p);
+        history.push(eq);
+        if (eq > peak) peak = eq;
+        const dd = roundTo((peak - eq) / peak * 100, 4);
+        dds.push(-dd);
+        if (dd > mdd) mdd = dd;
 
-            const ths = document.querySelectorAll('#tabOptimize table thead th'), colIdx = { cagr: 5, mdd: 6, calmar: 7, pf: 8 }[c1] || -1;
-            ths.forEach(th => th.classList.remove('bg-slate-700', 'text-yellow-400'));
-            if (colIdx !== -1) ths[colIdx].classList.add('bg-slate-700', 'text-yellow-400');
+        logs.push({ date: today.dateStr, close: today.close, rawClose: today.rawClose,
+            change: prev ? (today.close-prev.close)/prev.close*100 : 0,
+            bought, port: `${holdings.length}/${N}`, equity: eq, cash, realized, event, dd });
+    }
 
-            optBody.innerHTML = finalSelection.map((r, idx) => {
-                const getCls = (c) => c1 === c ? 'bg-blue-50 font-black border-x border-blue-100' : '';
-                const pfVal = (typeof r.pf === 'number' && !isNaN(r.pf)) ? r.pf.toFixed(2) : '0.00';
-                return `<tr class="border-b text-center">
-                    <td class="px-4 py-3 font-bold">${idx + 1}</td>
-                    <td>${r.N}</td>
-                    <td>${r.BuyP}%</td>
-                    <td>${r.SellP}%</td>
-                    <td>${r.D}</td>
-                    <td class="text-red-600 ${getCls('cagr')}">${r.cagr.toFixed(1)}%</td>
-                    <td class="text-blue-500 ${getCls('mdd')}">-${r.mdd.toFixed(1)}%</td>
-                    <td class="text-purple-600 ${getCls('calmar')}">${r.calmar.toFixed(2)}</td>
-                    <td class="${getCls('pf')}">${pfVal}</td>
-                    <td class="px-4 py-2 flex items-center justify-center gap-1.5">
-                        <button onclick="window.applyParams(${idx})" class="bg-blue-600 text-white px-2 py-1 rounded text-[9px] font-bold active:scale-90">적용</button>
-                        <button onclick="window.openPresetModal(${idx})" class="bg-emerald-600 text-white px-2 py-1 rounded text-[9px] font-bold active:scale-90">★</button>
-                    </td>
-                </tr>`;
-            }).join('');
-        };
-    </script>
+    const final = history[history.length-1];
+    const yrs   = Math.max((new Date(marketData[marketData.length-1].dateStr) - new Date(marketData[0].dateStr)) / 31557600000, 0.1);
+    const ret   = (final - seed) / seed * 100;
+    const cagr  = (Math.pow(final/seed, 1/yrs) - 1) * 100;
+    const pf    = gLoss ? gProfit/gLoss : (gProfit > 0 ? 99 : 0);
+    const pain  = dds.reduce((s,v)=>s+Math.abs(v), 0) / Math.max(dds.length, 1);
+
+    return { final, ret, cagr, mdd, pf, pain,
+        gpr:    pain   ? cagr/pain : 0,
+        calmar: mdd    ? cagr/mdd  : 0,
+        winRate: trades ? wins/trades*100 : 0,
+        history, dds, logs,
+        labels: marketData.map(d=>d.dateStr),
+        prices: marketData.map(d=>d.close) };
+}
+
+function runBacktest() {
+    if (!cachedData) return;
+    saveInputs();
+    const s = document.getElementById('startDate').value;
+    const e = document.getElementById('endDate').value;
+    const md = cachedData.filter(d => (!s||d.dateStr>=s) && (!e||d.dateStr<=e));
+    if (md.length < 5) { alert('데이터가 부족합니다.'); return; }
+    const params = {
+        seed:  +document.getElementById('seed').value,
+        fee:   +document.getElementById('fee').value / 100,
+        N:     +document.getElementById('divN').value,
+        BuyP:  +document.getElementById('paramBuyP').value,
+        SellP: +document.getElementById('paramSellP').value,
+        D:     +document.getElementById('maxD').value
+    };
+    displayResults(runSimulation(params, md, cachedData), params);
+}
+
+function displayResults(res, params) {
+    ['statsSection','annualSection','heatmapSection'].forEach(id => document.getElementById(id).classList.remove('hidden'));
+
+    document.getElementById('statFinal').innerText   = '$'+res.final.toLocaleString(undefined,{maximumFractionDigits:0});
+    document.getElementById('statReturn').innerText  = `${res.ret.toFixed(0)}%`;
+    document.getElementById('statCAGR').innerText    = `${res.cagr.toFixed(2)}%`;
+    document.getElementById('statMDD').innerText     = `-${res.mdd.toFixed(2)}%`;
+    document.getElementById('statWinRate').innerText = `${res.winRate.toFixed(1)}%`;
+    document.getElementById('statPF').innerText      = res.pf.toFixed(2);
+    document.getElementById('statPain').innerText    = res.pain.toFixed(2);
+    document.getElementById('statGPR').innerText     = res.gpr.toFixed(2);
+    document.getElementById('statCalmar').innerText  = res.calmar.toFixed(2);
+
+    // 연도별
+    let years = {}, monthly = {};
+    res.logs.forEach(l => {
+        const yr = l.date.slice(0,4), mo = +l.date.slice(5,7);
+        if (!years[yr]) years[yr] = { end:0, realized:0, peak:0, mdd:0 };
+        years[yr].end = l.equity; years[yr].realized += l.realized;
+        if (l.equity > years[yr].peak) years[yr].peak = l.equity;
+        const dd = (years[yr].peak - l.equity) / years[yr].peak * 100;
+        if (dd > years[yr].mdd) years[yr].mdd = dd;
+        if (!monthly[yr]) monthly[yr] = {};
+        monthly[yr][mo] = l.equity;
+    });
+    const sortedYrs = Object.keys(years).sort();
+    let prev = params.seed;
+    document.getElementById('annualBody').innerHTML = sortedYrs.map(yr => {
+        const y = years[yr], ret = (y.end - prev) / prev * 100;
+        const row = `<tr>
+            <td class="px-4 py-1.5 font-bold text-slate-900 text-center">${yr}</td>
+            <td class="px-4 py-1.5 text-center text-xs">$${prev.toLocaleString(undefined,{maximumFractionDigits:0})}</td>
+            <td class="px-4 py-1.5 font-semibold text-center text-xs">$${y.end.toLocaleString(undefined,{maximumFractionDigits:0})}</td>
+            <td class="px-4 py-1.5 font-bold text-center ${ret>=0?'text-red-600':'text-blue-600'}">${ret>=0?'+':''}${ret.toFixed(2)}%</td>
+            <td class="px-4 py-1.5 text-blue-500 font-bold text-center">-${y.mdd.toFixed(2)}%</td>
+            <td class="px-4 py-1.5 font-bold text-xs text-center">$${y.realized.toLocaleString(undefined,{maximumFractionDigits:0})}</td>
+        </tr>`;
+        prev = y.end; return row;
+    }).join('');
+
+    // 히트맵
+    let rolling = params.seed, hmHtml = '';
+    sortedYrs.forEach(yr => {
+        const yrStart = rolling;
+        let row = `<tr class="border-b border-slate-50"><td class="bg-slate-50 font-black text-slate-900 text-[11px] text-center">${yr}</td>`;
+        for (let m=1;m<=12;m++) {
+            const eq = monthly[yr][m];
+            if (eq) {
+                const r = (eq - rolling) / rolling * 100;
+                let bg = 'transparent', tc = '#1e293b';
+                if (r > 0) { const op = Math.min(0.1+Math.min(r/10,1)*0.85,0.95); bg=`rgba(239,68,68,${op.toFixed(2)})`; tc=op>.5?'white':'#7f1d1d'; }
+                else if (r < 0) { const op = Math.min(0.1+Math.min(-r/10,1)*0.85,0.95); bg=`rgba(16,185,129,${op.toFixed(2)})`; tc=op>.5?'white':'#064e3b'; }
+                row += `<td style="background:${bg};color:${tc}" class="text-center">${r>=0?'+':''}${r.toFixed(1)}%</td>`;
+                rolling = eq;
+            } else { row += `<td class="text-slate-200 text-center">-</td>`; }
+        }
+        const ar = (years[yr].end - yrStart) / yrStart * 100;
+        row += `<td class="bg-slate-50 font-black text-center ${ar>=0?'text-red-600':'text-blue-600'}">${ar>=0?'+':''}${ar.toFixed(1)}%</td></tr>`;
+        hmHtml += row;
+    });
+    document.getElementById('heatmapBody').innerHTML = hmHtml;
+
+    // 차트
+    if (equityChart) equityChart.destroy();
+    equityChart = new Chart(document.getElementById('equityChart').getContext('2d'), {
+        type:'line',
+        data:{ labels:res.labels, datasets:[
+            { label:'MDD (%)',   data:res.dds,    fill:true, backgroundColor:'rgba(239,68,68,.15)', borderColor:'rgba(239,68,68,.4)', borderWidth:1, pointRadius:0, yAxisID:'yMDD', tension:.1 },
+            { label:'SOXL 종가', data:res.prices, borderColor:'rgba(148,163,184,.3)', borderWidth:1.5, pointRadius:0, yAxisID:'yL', tension:.1 },
+            { label:'전략 자산', data:res.history, borderColor:'#2563eb', borderWidth:2.5, pointRadius:0, yAxisID:'yR', tension:.1 }
+        ]},
+        options:{
+            responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+            plugins:{ legend:{display:true,position:'top',labels:{font:{weight:'bold',size:11}}}, tooltip:{backgroundColor:'rgba(15,23,42,.9)',padding:12} },
+            scales:{
+                x:   { ticks:{maxTicksLimit:12,font:{size:10}}, grid:{display:false} },
+                yL:  { type:'linear', position:'left',  title:{display:true,text:'Price ($)',font:{size:10,weight:'bold'}}, ticks:{font:{size:9}} },
+                yR:  { type:'linear', position:'right', title:{display:true,text:'Equity ($)',font:{size:10,weight:'bold'}}, ticks:{font:{size:9}}, grid:{drawOnChartArea:false} },
+                yMDD:{ type:'linear', position:'right', min:-100, max:0, title:{display:true,text:'Drawdown (%)',font:{size:10,weight:'bold'},color:'#ef4444'}, ticks:{font:{size:8},color:'#ef4444'}, grid:{display:false} }
+            }
+        }
+    });
+
+    // 로그
+    document.getElementById('tradeLog').innerHTML = res.logs.map(l => {
+        const profit = l.event.includes('익절');
+        const loss   = l.event.includes('손절')||l.event.includes('손실');
+        const buy    = l.event.includes('매수');
+        let ec = 'text-slate-400';
+        if (profit) ec='bg-red-600 text-white px-2 py-0.5 rounded font-black';
+        else if (loss) ec='bg-blue-600 text-white px-2 py-0.5 rounded font-black';
+        else if (buy)  ec='bg-slate-700 text-white px-2 py-0.5 rounded font-black';
+        return `<tr class="hover:bg-slate-50 border-b text-center">
+            <td class="px-3 py-2 font-mono text-left text-xs">${l.date}</td>
+            <td class="px-3 py-2 text-right font-mono text-xs">$${l.rawClose}</td>
+            <td class="px-3 py-2 text-right font-bold text-xs ${l.change>=0?'text-red-600':'text-blue-600'}">${l.change.toFixed(2)}%</td>
+            <td class="px-3 py-2 text-right font-bold text-xs">${l.bought||'-'}</td>
+            <td class="px-3 py-2 text-center font-bold text-xs">${l.port}</td>
+            <td class="px-3 py-2 text-right font-bold text-slate-800 text-xs">$${l.equity.toLocaleString(undefined,{maximumFractionDigits:0})}</td>
+            <td class="px-3 py-2 text-right font-black text-xs ${l.realized>0?'text-red-600':l.realized<0?'text-blue-600':''}">${l.realized?l.realized.toLocaleString(undefined,{maximumFractionDigits:0}):'-'}</td>
+            <td class="px-3 py-2 text-center"><span class="text-[9px] uppercase ${ec}">${l.event}</span></td>
+            <td class="px-3 py-2 text-right font-bold text-red-400 text-xs">${l.dd>0?'-':''}${l.dd.toFixed(2)}%</td>
+        </tr>`;
+    }).join('');
+    document.getElementById('logCount').innerText = `${res.logs.length} 거래일 기록 완료`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  OPTIMIZER
+// ═══════════════════════════════════════════════════════════
+async function runOptimizer() {
+    if (!cachedData) return;
+    const s  = document.getElementById('optStartDate').value;
+    const e  = document.getElementById('optEndDate').value;
+    const md = cachedData.filter(d => (!s||d.dateStr>=s) && (!e||d.dateStr<=e));
+    if (md.length < 5) { alert('기간 내 데이터 부족'); return; }
+
+    const iter = +document.getElementById('optIter').value;
+    const seed = +document.getElementById('seed').value;
+    const fee  = +document.getElementById('fee').value / 100;
+    const filt = {
+        cagr:   +document.getElementById('filterCAGR').value,
+        mdd:    +document.getElementById('filterMDD').value,
+        calmar: +document.getElementById('filterCalmar').value,
+        pain:   +document.getElementById('filterPain').value
+    };
+    const rng = {
+        n:   [+document.getElementById('optNMin').value,    +document.getElementById('optNMax').value],
+        buy: [+document.getElementById('optBuyMin').value,  +document.getElementById('optBuyMax').value],
+        sel: [+document.getElementById('optSellMin').value, +document.getElementById('optSellMax').value],
+        d:   [+document.getElementById('optDMin').value,    +document.getElementById('optDMax').value]
+    };
+
+    const btn = document.getElementById('btnRunOptimizer');
+    const pSec = document.getElementById('optProgressSection');
+    const pBar = document.getElementById('optProgressBar');
+    const pTxt = document.getElementById('optProgressText');
+    const pDet = document.getElementById('optProgressDetail');
+    btn.disabled = true; pSec.classList.remove('hidden');
+    optimizationResults = [];
+
+    const CHUNK = 50;
+    for (let i=0; i<iter; i+=CHUNK) {
+        const end = Math.min(i+CHUNK, iter);
+        const pct = Math.round(end/iter*100);
+        pBar.style.width = pct+'%';
+        pTxt.innerText = `연산 진행률: ${pct}%`;
+        pDet.innerText = `${end} / ${iter}`;
+        await new Promise(r => setTimeout(r, 0));
+
+        for (let j=i; j<end; j++) {
+            const N    = Math.floor(Math.random()*(rng.n[1]-rng.n[0]+1)) + rng.n[0];
+            const BuyP = parseFloat((Math.floor(Math.random()*((rng.buy[1]-rng.buy[0])*10+1))/10+rng.buy[0]).toFixed(1));
+            const SellP= parseFloat((Math.floor(Math.random()*((rng.sel[1]-rng.sel[0])*10+1))/10+rng.sel[0]).toFixed(1));
+            const D    = Math.floor(Math.random()*(rng.d[1]-rng.d[0]+1)) + rng.d[0];
+            const res  = runSimulation({ seed, fee, N, BuyP, SellP, D }, md, cachedData);
+            if (res.cagr>=filt.cagr && res.mdd<=filt.mdd && res.calmar>=filt.calmar && res.pain<=filt.pain) {
+                optimizationResults.push({ N, BuyP, SellP, D, startDate:s, endDate:e, ...res });
+            }
+        }
+    }
+    renderOptimizeTable();
+    document.getElementById('optStatus').innerText = `(${optimizationResults.length}개 발견)`;
+    btn.disabled = false;
+}
+
+function renderOptimizeTable() {
+    const c1 = document.getElementById('optSortCriteria').value;
+    const c2 = document.getElementById('optSortCriteria2').value;
+    const cmp = c => (a,b) => {
+        if (c==='pf')     return b.pf-a.pf;
+        if (c==='cagr')   return b.cagr-a.cagr;
+        if (c==='gpr')    return b.gpr-a.gpr;
+        if (c==='mdd')    return a.mdd-b.mdd;
+        if (c==='pain')   return a.pain-b.pain;
+        if (c==='calmar') return b.calmar-a.calmar;
+        return 0;
+    };
+    optimizationResults.sort(cmp(c1));
+    let rows = optimizationResults.slice(0,30);
+    if (c2!=='none') rows.sort(cmp(c2));
+
+    const ths = document.querySelectorAll('#tabOptimize table thead th');
+    ths.forEach(th => th.classList.remove('bg-slate-700','text-yellow-400'));
+    const hm = {cagr:5,mdd:6,gpr:7,calmar:8,pain:9,pf:10};
+    if (hm[c1]!==undefined) ths[hm[c1]].classList.add('bg-slate-700','text-yellow-400');
+
+    if (!rows.length) {
+        document.getElementById('optBody').innerHTML = `<tr><td colspan="12" class="py-20 text-red-400 italic font-bold text-center">조건을 만족하는 결과가 없습니다.</td></tr>`;
+        return;
+    }
+
+    const cc = c => c1===c ? 'bg-blue-50 font-black border-x border-blue-100' : '';
+    document.getElementById('optBody').innerHTML = rows.map((r,i) => `
+        <tr class="clickable-row border-b text-center">
+            <td class="px-4 py-3 font-bold">${i+1}</td>
+            <td class="px-2 py-3 font-semibold">${r.N}</td>
+            <td class="px-2 py-3 text-red-600 font-bold">${r.BuyP}%</td>
+            <td class="px-2 py-3 text-blue-600 font-bold">${r.SellP}%</td>
+            <td class="px-2 py-3 font-semibold">${r.D}</td>
+            <td class="px-4 py-3 font-black text-red-600 ${cc('cagr')}">${r.cagr.toFixed(1)}%</td>
+            <td class="px-4 py-3 font-bold text-blue-500 ${cc('mdd')}">-${r.mdd.toFixed(1)}%</td>
+            <td class="px-4 py-3 font-medium text-slate-700 ${cc('gpr')}">${r.gpr.toFixed(2)}</td>
+            <td class="px-4 py-3 font-medium text-purple-600 ${cc('calmar')}">${r.calmar.toFixed(2)}</td>
+            <td class="px-4 py-3 text-slate-400 ${cc('pain')}">${r.pain.toFixed(2)}</td>
+            <td class="px-4 py-3 font-black text-red-700 ${cc('pf')}">${r.pf.toFixed(2)}</td>
+            <td class="px-4 py-2">
+                <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="applyParams(${r.N},${r.BuyP},${r.SellP},${r.D},'${r.startDate}','${r.endDate}')"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90">적용</button>
+                    <button onclick="saveOptResultAsPreset(${r.N},${r.BuyP},${r.SellP},${r.D},'${r.startDate}','${r.endDate}')"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90" title="프리셋으로 저장">★</button>
+                </div>
+            </td>
+        </tr>`).join('');
+}
+
+function applyParams(N, BuyP, SellP, D, startDate, endDate) {
+    document.getElementById('divN').value       = N;
+    document.getElementById('paramBuyP').value  = BuyP;
+    document.getElementById('paramSellP').value = SellP;
+    document.getElementById('maxD').value        = D;
+    if (startDate) document.getElementById('startDate').value = startDate;
+    if (endDate)   document.getElementById('endDate').value   = endDate;
+    clearBacktestResults();
+    switchTab('backtest');
+}
+
+function clearBacktestResults() {
+    ['statsSection','annualSection','heatmapSection'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    if (equityChart) { equityChart.destroy(); equityChart = null; }
+    document.getElementById('tradeLog').innerHTML = '';
+    document.getElementById('logCount').innerText = 'Ready';
+}
+</script>
 </body>
 </html>
