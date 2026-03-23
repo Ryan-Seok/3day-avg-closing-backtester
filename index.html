@@ -111,7 +111,7 @@
             <!-- 메인 차트 -->
             <div class="card p-6 relative min-h-[550px] shadow-lg mb-8">
                 <div id="loadingOverlay" class="absolute inset-0 bg-white/95 flex flex-col items-center justify-center z-20 rounded-lg hidden">
-                    <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4 mx-auto"></div>
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-widest animate-pulse">시뮬레이션 분석 중...</p>
                 </div>
                 <div class="chart-container h-[500px]"><canvas id="equityChart"></canvas></div>
@@ -186,7 +186,6 @@
         const TARGET_SHEET_ID = "1CY8hVPAXfPZZOfBgTaU5ygeLg4OXR14So_6dhfyoJjs";
         const DEFAULT_URL = `https://docs.google.com/spreadsheets/d/${TARGET_SHEET_ID}/export?format=csv&gid=0`;
 
-        // [고침] 전역 함수로 정의하여 어디서든 접근 가능하게 함
         function roundTo(val, p) { 
             const f = Math.pow(10, p); 
             return Math.round(val * f) / f; 
@@ -203,7 +202,7 @@
             const dot = document.getElementById('dataStatusDot');
             try {
                 const res = await fetch(`${DEFAULT_URL}&t=${Date.now()}`);
-                if (!res.ok) throw new Error("Google Sheets Fetch Error");
+                if (!res.ok) throw new Error("HTTP Status " + res.status);
                 const txt = await res.text();
                 const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
                 
@@ -227,8 +226,13 @@
                 dot.classList.replace('bg-slate-300', 'bg-emerald-500');
                 dot.classList.remove('animate-pulse');
 
-                // 최적화 종료일 기본값을 마지막 날짜로 설정
                 const lastDate = allData[allData.length-1].dateStr;
+                
+                // [수정] 기본 시작일을 2014-01-01로 설정
+                if(!document.getElementById('startDate').value) document.getElementById('startDate').value = "2014-01-01";
+                if(!document.getElementById('optStartDate').value) document.getElementById('optStartDate').value = "2014-01-01";
+                
+                // 종료일은 마지막 데이터 날짜로
                 if(!document.getElementById('endDate').value) document.getElementById('endDate').value = lastDate;
                 if(!document.getElementById('optEndDate').value) document.getElementById('optEndDate').value = lastDate;
                 
@@ -335,7 +339,6 @@
             window.switchTab('backtest');
         };
 
-        // --- 백테스트 엔진 ---
         function runSimulation(params, marketData, allFullData, isOpt = false) {
             const { seed, fee, N, BuyP, SellP, D } = params;
             const calcP = maxDataPrecision + 2;
@@ -382,7 +385,7 @@
                 if (dd > mdd) mdd = dd;
                 if (!isOpt) { history.push(currentEq); strategyDrawdowns.push(-dd); dailyLogs.push({ date: today.dateStr, close: today.close, rawClose: today.rawClose, change: prev ? ((today.close-prev.close)/prev.close*100) : 0, bought: unitsBought, port: `${holdings.length}/${N}`, equity: currentEq, realized, event, dd }); }
             }
-            const finalVal = !isOpt ? (history[history.length-1] || cash) : cash;
+            const finalVal = !isOpt ? history[history.length-1] : cash;
             const diffY = Math.max((new Date(marketData[marketData.length - 1].dateStr) - new Date(marketData[0].dateStr)) / (1000 * 60 * 60 * 24 * 365.25), 0.1);
             const cagr = (Math.pow(finalVal / seed, 1 / diffY) - 1) * 100;
             const pf = totalLoss !== 0 ? (totalProfit / totalLoss) : (totalProfit > 0 ? 99 : 0);
@@ -482,9 +485,14 @@
                 const N = Math.floor(Math.random() * (ranges.n[1] - ranges.n[0] + 1)) + ranges.n[0], BuyP = parseFloat((Math.floor(Math.random() * ((ranges.buy[1] - ranges.buy[0]) * 10 + 1)) / 10 + ranges.buy[0]).toFixed(1)), SellP = parseFloat((Math.floor(Math.random() * ((ranges.sell[1] - ranges.sell[0]) * 10 + 1)) / 10 + ranges.sell[0]).toFixed(1)), D = Math.floor(Math.random() * (ranges.d[1] - ranges.d[0] + 1)) + ranges.d[0];
                 const res = runSimulation({ seed:10000, fee:0, N, BuyP, SellP, D }, marketData, cachedData, true);
                 if (res.cagr >= filters.cagr && res.mdd <= filters.mdd && res.calmar >= filters.calmar) { window.optimizationResults.push({ N, BuyP, SellP, D, ...res, startDate: start, endDate: end }); }
-                if (i % 100 === 0) { const pct = Math.round((i / iters) * 100); bar.style.width = pct + '%'; pText.innerText = `연산 진행률: ${pct}%`; detail.innerText = `${i} / ${iters} (총조합수: ${totalComb.toLocaleString()})`; await new Promise(r => setTimeout(r, 0)); }
+                if (i % 100 === 0) { 
+                    const pct = Math.round((i / iters) * 100);
+                    bar.style.width = pct + '%'; 
+                    pText.innerText = `${pct}%`; 
+                    detail.innerText = `${i} / ${iters} (총조합수: ${totalComb.toLocaleString()})`; await new Promise(r => setTimeout(r, 0)); 
+                }
             }
-            bar.style.width = '100%'; pText.innerText = '연산 진행률: 100%'; detail.innerText = `${iters} / ${iters} (총조합수: ${totalComb.toLocaleString()}) 완료`; window.renderOptimizeTable(); btn.disabled = false;
+            bar.style.width = '100%'; pText.innerText = '100%'; detail.innerText = `${iters} / ${iters} (총조합수: ${totalComb.toLocaleString()}) 완료`; window.renderOptimizeTable(); btn.disabled = false;
         };
 
         window.renderOptimizeTable = function() {
