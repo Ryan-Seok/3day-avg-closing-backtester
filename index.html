@@ -24,11 +24,11 @@
         .compact-table td { padding: 4px 12px !important; font-size: 11px !important; }
         .heatmap-table th { font-size: 9px; padding: 6px 2px; text-transform: uppercase; color: #64748b; }
         .heatmap-table td { font-size: 10px; padding: 10px 2px; font-weight: 700; border: 1px solid white; transition: all 0.2s; }
-        
         #modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(2px); }
     </style>
 </head>
 <body class="p-4 md:p-8 text-slate-800">
+
     <div id="saveIndicator" class="save-indicator bg-emerald-500 text-white shadow-lg">Settings Saved</div>
 
     <!-- 프리셋 저장 모달 -->
@@ -94,99 +94,99 @@
                     <input type="number" id="paramSellP" value="1" step="0.1" class="w-full p-2 bg-orange-50 border border-orange-100 rounded-lg outline-none font-bold text-orange-700 text-sm text-center persist">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest text-center text-center">만기일 (D)</label>
+                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest text-center">만기일 (D)</label>
                     <input type="number" id="maxD" value="8" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-sm text-center persist">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest text-center text-center text-center text-center">시작일</label>
+                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest text-center">시작일</label>
                     <input type="date" id="startDate" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-xs text-center persist">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest text-center text-center text-center text-center">종료일</label>
+                    <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest text-center">종료일</label>
                     <input type="date" id="endDate" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none font-bold text-slate-700 text-xs text-center persist">
                 </div>
                 <div class="col-span-1 text-center">
-                    <button onclick="window.runBacktest()" class="w-full mt-5 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 transition-all active:scale-95 text-center text-center">분석 실행</button>
+                    <button onclick="window.runBacktest()" class="w-full mt-5 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 transition-all active:scale-95">분석 실행</button>
                 </div>
             </div>
 
             <!-- 요약 지표 패널 -->
-            <div id="statsSection" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-3 mb-6 hidden animate-in fade-in text-center text-center">
-                <div class="card p-4 stat-card border-blue-500 text-center text-xs">
+            <div id="statsSection" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-3 mb-6 hidden animate-in fade-in text-center">
+                <div class="card p-4 stat-card border-blue-500 text-xs">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">최종 자산</p>
                     <h3 id="statFinal" class="text-base font-black text-slate-800 tracking-tighter">$0</h3>
                 </div>
-                <div class="card p-4 stat-card border-emerald-500 text-center text-xs text-center">
+                <div class="card p-4 stat-card border-emerald-500 text-xs">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">누적 수익률</p>
                     <h3 id="statReturn" class="text-base font-black text-emerald-600 tracking-tighter">0%</h3>
                 </div>
-                <div class="card p-4 stat-card border-indigo-500 text-center text-xs text-center">
+                <div class="card p-4 stat-card border-indigo-500 text-xs">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">CAGR</p>
                     <h3 id="statCAGR" class="text-base font-black text-indigo-600 tracking-tighter">0%</h3>
                 </div>
-                <div class="card p-4 stat-card border-red-500 text-center text-xs text-center text-center text-center">
+                <div class="card p-4 stat-card border-red-500 text-xs">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">MDD</p>
-                    <h3 id="statMDD" class="text-base font-black text-red-500 tracking-tighter text-center">0%</h3>
+                    <h3 id="statMDD" class="text-base font-black text-red-500 tracking-tighter">0%</h3>
                 </div>
-                <div class="card p-4 stat-card border-teal-500 text-center text-xs text-center text-center">
+                <div class="card p-4 stat-card border-teal-500 text-xs">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Pain Index</p>
                     <h3 id="statPain" class="text-base font-black text-teal-600 tracking-tighter">0.00</h3>
                 </div>
-                <div class="card p-4 stat-card border-yellow-500 text-center text-xs text-center">
+                <div class="card p-4 stat-card border-yellow-500 text-xs">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">GPR</p>
                     <h3 id="statGPR" class="text-base font-black text-yellow-600 tracking-tighter">0.00</h3>
                 </div>
-                <div class="card p-4 stat-card border-purple-500 text-center text-xs text-center">
+                <div class="card p-4 stat-card border-purple-500 text-xs">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Calmar</p>
                     <h3 id="statCalmar" class="text-base font-black text-purple-600 tracking-tighter">0.00</h3>
                 </div>
-                <div class="card p-4 stat-card border-orange-500 text-center text-xs text-center text-center">
+                <div class="card p-4 stat-card border-orange-500 text-xs">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">승률</p>
                     <h3 id="statWinRate" class="text-base font-black text-orange-600 tracking-tighter">0%</h3>
                 </div>
-                <div class="card p-4 stat-card border-cyan-500 text-center text-xs text-center text-center">
+                <div class="card p-4 stat-card border-cyan-500 text-xs">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Profit Factor</p>
                     <h3 id="statPF" class="text-base font-black text-cyan-600 tracking-tighter">0.00</h3>
                 </div>
             </div>
 
-            <!-- 연도별 성과 분석 섹션 -->
-            <div id="annualSection" class="hidden mb-6 card p-3 border-slate-200 text-center text-center">
-                <div class="flex items-center gap-2 mb-2 text-center text-center">
+            <!-- 연도별 성과 분석 -->
+            <div id="annualSection" class="hidden mb-6 card p-3 border-slate-200">
+                <div class="flex items-center gap-2 mb-2">
                     <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    <h3 class="text-[11px] font-bold text-slate-700 uppercase tracking-wider text-center text-center">연도별 성과 분석</h3>
+                    <h3 class="text-[11px] font-bold text-slate-700 uppercase tracking-wider">연도별 성과 분석</h3>
                 </div>
-                <div class="overflow-x-auto text-center text-center text-center text-center text-center">
-                    <table class="w-full text-center compact-table text-center text-center text-center">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-center compact-table">
                         <thead>
-                            <tr class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-100 text-center text-center text-center text-center text-center">
-                                <th class="px-4 py-1.5 text-center text-center text-center">연도</th>
-                                <th class="px-4 py-1.5 text-center text-center text-center">시작 자산 ($)</th>
-                                <th class="px-4 py-1.5 text-center text-center text-center">종료 자산 ($)</th>
-                                <th class="px-4 py-1.5 text-center text-center text-center text-center">연수익률 (%)</th>
-                                <th class="px-4 py-1.5 text-red-500 text-center text-center text-center text-center text-center">Year MDD (%)</th>
-                                <th class="px-4 py-1.5 text-emerald-600 text-center text-center text-center text-center text-center text-center">실현수익 ($)</th>
+                            <tr class="bg-slate-50 text-slate-500 uppercase font-black border-b border-slate-100">
+                                <th class="px-4 py-1.5">연도</th>
+                                <th class="px-4 py-1.5">시작 자산 ($)</th>
+                                <th class="px-4 py-1.5">종료 자산 ($)</th>
+                                <th class="px-4 py-1.5">연수익률 (%)</th>
+                                <th class="px-4 py-1.5 text-red-500">Year MDD (%)</th>
+                                <th class="px-4 py-1.5 text-emerald-600">실현수익 ($)</th>
                             </tr>
                         </thead>
-                        <tbody id="annualBody" class="divide-y divide-slate-50 font-medium text-slate-700 text-center text-center text-center"></tbody>
+                        <tbody id="annualBody" class="divide-y divide-slate-50 font-medium text-slate-700"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- 월별 수익률 히트맵 섹션 -->
-            <div id="heatmapSection" class="hidden mb-6 card p-5 border-slate-200 overflow-hidden text-center text-center text-center text-center text-center text-center text-center">
-                <div class="flex items-center gap-2 mb-4 justify-center text-center text-center text-center">
+            <!-- 월별 수익률 히트맵 -->
+            <div id="heatmapSection" class="hidden mb-6 card p-5 border-slate-200 overflow-hidden">
+                <div class="flex items-center gap-2 mb-4 justify-center">
                     <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    <h3 class="text-xs font-black text-slate-700 uppercase tracking-widest text-center text-center text-center text-center text-center text-center">Monthly Returns Heatmap (월별 수익률)</h3>
+                    <h3 class="text-xs font-black text-slate-700 uppercase tracking-widest">Monthly Returns Heatmap (월별 수익률)</h3>
                 </div>
-                <div class="overflow-x-auto text-center text-center text-center">
-                    <table class="w-full heatmap-table text-center border-collapse text-center text-center">
+                <div class="overflow-x-auto">
+                    <table class="w-full heatmap-table text-center border-collapse">
                         <thead>
-                            <tr class="border-b-2 border-slate-100 text-center text-center text-center">
-                                <th class="w-16 text-center text-center text-center">Year</th>
-                                <th class="text-center text-center text-center">Jan</th><th class="text-center text-center text-center">Feb</th><th class="text-center text-center text-center">Mar</th><th class="text-center text-center text-center">Apr</th><th class="text-center text-center text-center">May</th><th class="text-center text-center text-center">Jun</th>
-                                <th class="text-center text-center text-center">Jul</th><th class="text-center text-center text-center">Aug</th><th class="text-center text-center text-center">Sep</th><th class="text-center text-center text-center">Oct</th><th class="text-center text-center text-center">Nov</th><th class="text-center text-center text-center">Dec</th>
-                                <th class="bg-slate-50 w-20 text-center text-center text-center text-center text-center">Annual</th>
+                            <tr class="border-b-2 border-slate-100">
+                                <th class="w-16">Year</th>
+                                <th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th>
+                                <th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th>
+                                <th class="bg-slate-50 w-20">Annual</th>
                             </tr>
                         </thead>
                         <tbody id="heatmapBody"></tbody>
@@ -194,142 +194,143 @@
                 </div>
             </div>
 
-            <!-- 통합 차트 영역 -->
-            <div class="grid grid-cols-1 gap-2 mb-8 text-center text-center text-center">
-                <div class="card p-6 relative min-h-[550px] shadow-lg text-center text-center text-center text-center">
-                    <div id="loadingOverlay" class="absolute inset-0 bg-white/95 flex flex-col items-center justify-center z-20 rounded-lg hidden text-center text-center text-center">
-                        <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4 mx-auto text-center text-center text-center"></div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest animate-pulse text-center text-center text-center text-center">시뮬레이션 분석 중...</p>
+            <!-- 차트 -->
+            <div class="grid grid-cols-1 gap-2 mb-8">
+                <div class="card p-6 relative min-h-[550px] shadow-lg">
+                    <div id="loadingOverlay" class="absolute inset-0 bg-white/95 flex flex-col items-center justify-center z-20 rounded-lg hidden">
+                        <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4 mx-auto"></div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest animate-pulse">시뮬레이션 분석 중...</p>
                     </div>
-                    <div class="chart-container h-[500px] text-center text-center text-center">
+                    <div class="chart-container h-[500px]">
                         <canvas id="equityChart"></canvas>
                     </div>
                 </div>
             </div>
 
             <!-- 일별 상세 거래 내역 -->
-            <div class="card overflow-hidden mb-12 shadow-sm text-center">
-                <div class="bg-slate-900 px-6 py-4 flex justify-between items-center text-white text-center">
-                    <h3 class="font-black uppercase text-[10px] tracking-widest leading-none text-center text-center text-center">일별 상세 거래 내역</h3>
-                    <span id="logCount" class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter text-center text-center text-center">Ready</span>
+            <div class="card overflow-hidden mb-12 shadow-sm">
+                <div class="bg-slate-900 px-6 py-4 flex justify-between items-center text-white">
+                    <h3 class="font-black uppercase text-[10px] tracking-widest leading-none">일별 상세 거래 내역</h3>
+                    <span id="logCount" class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Ready</span>
                 </div>
-                <div class="table-container text-center text-center text-center text-center text-center">
-                    <table class="w-full text-left text-[11px] border-collapse text-center text-center text-center text-center text-center text-center">
-                        <thead class="sticky-th text-center">
-                            <tr class="uppercase text-[9px] font-black text-center text-center text-center text-center text-center text-center text-center">
-                                <th class="px-3 py-3 border-b border-slate-700 text-left text-left text-left">날짜</th>
-                                <th class="px-3 py-3 border-b border-slate-700 text-right text-right text-right">종가 ($)</th>
-                                <th class="px-3 py-3 border-b border-slate-700 text-right text-right text-right">등락 (%)</th>
-                                <th class="px-3 py-3 border-b border-slate-700 text-right text-blue-400 text-right text-right">매수량 (주)</th>
-                                <th class="px-3 py-3 border-b border-slate-700 text-center text-blue-300 text-center text-center text-center text-center text-center">포트</th>
-                                <th class="px-3 py-3 border-b border-slate-700 text-right text-yellow-300 text-right text-right">평가액 ($)</th>
-                                <th class="px-3 py-3 border-b border-slate-700 text-right text-emerald-300 text-right text-right">실현수익 ($)</th>
-                                <th class="px-3 py-3 border-b border-slate-700 text-center text-center text-center text-center text-center text-center text-center">상태</th>
-                                <th class="px-3 py-3 border-b border-slate-700 text-right text-red-300 text-right text-right">DD (%)</th>
+                <div class="table-container">
+                    <table class="w-full text-left text-[11px] border-collapse">
+                        <thead class="sticky-th">
+                            <tr class="uppercase text-[9px] font-black">
+                                <th class="px-3 py-3 border-b border-slate-700 text-left">날짜</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right">종가 ($)</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right">등락 (%)</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right text-blue-400">매수량 (주)</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-center text-blue-300">포트</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right text-yellow-300">평가액 ($)</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right text-emerald-300">실현수익 ($)</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-center">상태</th>
+                                <th class="px-3 py-3 border-b border-slate-700 text-right text-red-300">DD (%)</th>
                             </tr>
                         </thead>
-                        <tbody id="tradeLog" class="divide-y divide-slate-100 bg-white text-slate-700 font-medium text-center text-center text-center text-center text-center text-center text-center text-center text-center"></tbody>
+                        <tbody id="tradeLog" class="divide-y divide-slate-100 bg-white text-slate-700 font-medium"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <div id="tabOptimize" class="hidden text-center text-center text-center text-center text-center text-center">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 text-center text-center text-center">
-                <div class="card p-5 bg-gradient-to-br from-white to-slate-50 border-blue-100 lg:col-span-2 text-center text-center text-center">
-                    <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-4 italic text-center text-center text-center text-center text-center text-center text-center text-center">최적화 파라미터 및 기간 설정</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-center text-center">
-                        <div class="space-y-1 text-center text-center text-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center">분할수 (N) 범위</label>
+        <!-- 파라미터 최적화 탭 -->
+        <div id="tabOptimize" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div class="card p-5 bg-gradient-to-br from-white to-slate-50 border-blue-100 lg:col-span-2">
+                    <h3 class="text-sm font-black text-blue-600 uppercase tracking-widest mb-4 italic">최적화 파라미터 및 기간 설정</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">분할수 (N) 범위</label>
                             <div class="flex gap-1">
-                                <input type="number" id="optNMin" value="3" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center">
-                                <input type="number" id="optNMax" value="10" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center">
+                                <input type="number" id="optNMin" value="3" class="w-full p-2 border rounded text-center text-xs persist">
+                                <input type="number" id="optNMax" value="10" class="w-full p-2 border rounded text-center text-xs persist">
                             </div>
                         </div>
-                        <div class="space-y-1 text-center text-center text-center text-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center text-center">매수 (P1%) 범위</label>
-                            <div class="flex gap-1 text-center text-center text-center">
-                                <input type="number" id="optBuyMin" value="-1" step="0.1" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center">
-                                <input type="number" id="optBuyMax" value="2" step="0.1" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">매수 (P1%) 범위</label>
+                            <div class="flex gap-1">
+                                <input type="number" id="optBuyMin" value="-1" step="0.1" class="w-full p-2 border rounded text-center text-xs persist">
+                                <input type="number" id="optBuyMax" value="2" step="0.1" class="w-full p-2 border rounded text-center text-xs persist">
                             </div>
                         </div>
-                        <div class="space-y-1 text-center text-center text-center text-center text-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center text-center text-center">매도 (P2%) 범위</label>
-                            <div class="flex gap-1 text-center text-center text-center">
-                                <input type="number" id="optSellMin" value="0.5" step="0.1" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center text-center">
-                                <input type="number" id="optSellMax" value="4" step="0.1" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center text-center">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">매도 (P2%) 범위</label>
+                            <div class="flex gap-1">
+                                <input type="number" id="optSellMin" value="0.5" step="0.1" class="w-full p-2 border rounded text-center text-xs persist">
+                                <input type="number" id="optSellMax" value="4" step="0.1" class="w-full p-2 border rounded text-center text-xs persist">
                             </div>
                         </div>
-                        <div class="space-y-1 text-center text-center text-center text-center text-center text-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center text-center text-center">최대보유일(D) 범위</label>
-                            <div class="flex gap-1 text-center text-center text-center text-center text-center text-center">
-                                <input type="number" id="optDMin" value="4" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center text-center text-center">
-                                <input type="number" id="optDMax" value="20" class="w-full p-2 border rounded text-center text-xs persist text-center text-center text-center text-center text-center">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">최대보유일(D) 범위</label>
+                            <div class="flex gap-1">
+                                <input type="number" id="optDMin" value="4" class="w-full p-2 border rounded text-center text-xs persist">
+                                <input type="number" id="optDMax" value="20" class="w-full p-2 border rounded text-center text-xs persist">
                             </div>
                         </div>
                     </div>
-                    <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-center text-center text-center">
-                        <div class="space-y-1 text-center text-center text-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center">최적화 시작일</label>
-                            <input type="date" id="optStartDate" value="2014-01-01" class="w-full p-2 border rounded text-xs persist text-center text-center text-center text-center text-center">
+                    <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">최적화 시작일</label>
+                            <input type="date" id="optStartDate" value="2014-01-01" class="w-full p-2 border rounded text-xs persist">
                         </div>
-                        <div class="space-y-1 text-center text-center text-center text-center text-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center text-center text-center text-center">최적화 종료일</label>
-                            <input type="date" id="optEndDate" class="w-full p-2 border rounded text-xs text-center persist text-center text-center text-center text-center">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">최적화 종료일</label>
+                            <input type="date" id="optEndDate" class="w-full p-2 border rounded text-xs persist">
                         </div>
-                        <div class="space-y-1 text-center text-center text-center text-center text-center text-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase text-center text-center text-center text-center text-center text-center text-center text-center">반복 횟수</label>
-                            <input type="number" id="optIter" value="10000" class="w-full p-2 border border-blue-200 rounded text-center font-bold text-blue-600 text-xs persist text-center text-center text-center text-center text-center">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">반복 횟수</label>
+                            <input type="number" id="optIter" value="10000" class="w-full p-2 border border-blue-200 rounded text-center font-bold text-blue-600 text-xs persist">
                         </div>
-                        <div class="flex items-end text-center text-center text-center text-center">
-                            <button onclick="window.runOptimizer()" id="btnRunOptimizer" class="w-full bg-blue-600 text-white p-2.5 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">최적화 시작</button>
+                        <div class="flex items-end">
+                            <button onclick="window.runOptimizer()" id="btnRunOptimizer" class="w-full bg-blue-600 text-white p-2.5 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">최적화 시작</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="card p-5 bg-white border-emerald-100 text-center text-center text-center text-center text-center">
-                    <h3 class="text-sm font-black text-emerald-600 uppercase tracking-widest mb-4 italic text-center text-center text-center text-center text-center text-center text-center text-center text-center">결과 필터링</h3>
-                    <div class="grid grid-cols-2 gap-4 text-center text-center text-center text-center text-center">
-                        <div class="space-y-1 text-center text-center text-center text-center text-center text-center text-center text-center">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center text-center text-center text-center text-center text-center text-center text-center">최소 CAGR (%)</label>
-                            <input type="number" id="filterCAGR" value="30" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist text-center text-center text-center text-center text-center text-center text-center text-center">
+                <div class="card p-5 bg-white border-emerald-100">
+                    <h3 class="text-sm font-black text-emerald-600 uppercase tracking-widest mb-4 italic">결과 필터링</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter">최소 CAGR (%)</label>
+                            <input type="number" id="filterCAGR" value="30" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist">
                         </div>
-                        <div class="space-y-1 text-center text-center text-center text-center text-center text-center text-center text-center text-center">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">최대 MDD (%)</label>
-                            <input type="number" id="filterMDD" value="40" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold text-red-500 persist text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter">최대 MDD (%)</label>
+                            <input type="number" id="filterMDD" value="40" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold text-red-500 persist">
                         </div>
-                        <div class="space-y-1 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">최소 Calmar</label>
-                            <input type="number" id="filterCalmar" value="1.4" step="0.1" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter">최소 Calmar</label>
+                            <input type="number" id="filterCalmar" value="1.4" step="0.1" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist">
                         </div>
-                        <div class="space-y-1 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">최대 Pain Index</label>
-                            <input type="number" id="filterPain" value="6" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-tighter">최대 Pain Index</label>
+                            <input type="number" id="filterPain" value="6" class="w-full p-2 bg-slate-50 border rounded text-center text-xs font-bold persist">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="optProgressSection" class="hidden mb-6 px-2 text-center text-center text-center text-center text-center text-center text-center">
-                <div class="flex justify-between text-[10px] font-bold text-blue-600 mb-1 text-center text-center text-center text-center text-center">
+            <div id="optProgressSection" class="hidden mb-6 px-2">
+                <div class="flex justify-between text-[10px] font-bold text-blue-600 mb-1">
                     <span id="optProgressText">연산 진행률: 0%</span>
                     <span id="optProgressDetail">0 / 0 (총조합수: 0)</span>
                 </div>
-                <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden border text-center text-center text-center text-center text-center">
-                    <div id="optProgressBar" class="progress-bar bg-blue-500 h-full w-0 text-center text-center text-center text-center text-center"></div>
+                <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden border">
+                    <div id="optProgressBar" class="progress-bar bg-blue-500 h-full w-0"></div>
                 </div>
             </div>
 
-            <div class="card overflow-hidden text-center text-center text-center">
-                <div class="bg-slate-800 px-6 py-4 flex flex-col md:flex-row justify-between items-center text-white gap-4 text-center text-center text-center text-center text-center">
-                    <div class="flex flex-col text-left text-center text-center text-center text-center">
-                        <h3 class="font-black uppercase text-[10px] tracking-widest text-center text-center text-center text-center text-center text-center">Optimization Leaderboard</h3>
-                        <span id="optStatus" class="text-slate-400 text-[9px] font-normal uppercase mt-0.5 text-center text-center text-center text-center text-center text-center text-center">Idle</span>
+            <div class="card overflow-hidden">
+                <div class="bg-slate-800 px-6 py-4 flex flex-col md:flex-row justify-between items-center text-white gap-4">
+                    <div class="flex flex-col text-left">
+                        <h3 class="font-black uppercase text-[10px] tracking-widest">Optimization Leaderboard</h3>
+                        <span id="optStatus" class="text-slate-400 text-[9px] font-normal uppercase mt-0.5">Idle</span>
                     </div>
-                    <div class="flex flex-col md:flex-row items-center gap-4 text-center text-center text-center text-center text-center text-center text-center">
-                        <div class="flex items-center gap-2 text-center text-center text-center text-center text-center text-center text-center">
-                            <label class="text-[9px] font-bold uppercase text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">1차 정렬 (Top 30):</label>
-                            <select id="optSortCriteria" onchange="renderOptimizeTable()" class="bg-slate-700 text-white text-[10px] font-bold p-1 rounded outline-none border border-slate-600 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
+                    <div class="flex flex-col md:flex-row items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <label class="text-[9px] font-bold uppercase text-slate-400">1차 정렬 (Top 30):</label>
+                            <select id="optSortCriteria" onchange="renderOptimizeTable()" class="bg-slate-700 text-white text-[10px] font-bold p-1 rounded outline-none border border-slate-600">
                                 <option value="calmar" selected>Calmar Ratio</option>
                                 <option value="pf">Profit Factor</option>
                                 <option value="cagr">CAGR</option>
@@ -338,9 +339,9 @@
                                 <option value="pain">Pain Index (낮은순)</option>
                             </select>
                         </div>
-                        <div class="flex items-center gap-2 text-center text-center text-center text-center text-center text-center text-center">
-                            <label class="text-[9px] font-bold uppercase text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">2차 정렬:</label>
-                            <select id="optSortCriteria2" onchange="renderOptimizeTable()" class="bg-slate-700 text-blue-300 text-[10px] font-bold p-1 rounded outline-none border border-blue-600/50 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
+                        <div class="flex items-center gap-2">
+                            <label class="text-[9px] font-bold uppercase text-slate-400">2차 정렬:</label>
+                            <select id="optSortCriteria2" onchange="renderOptimizeTable()" class="bg-slate-700 text-blue-300 text-[10px] font-bold p-1 rounded outline-none border border-blue-600/50">
                                 <option value="none">없음</option>
                                 <option value="pf">Profit Factor</option>
                                 <option value="cagr">CAGR</option>
@@ -352,26 +353,26 @@
                         </div>
                     </div>
                 </div>
-                <div class="table-container text-center text-center text-center text-center text-center">
-                    <table class="w-full text-center text-[11px] border-collapse text-center text-center text-center text-center text-center text-center text-center">
-                        <thead class="sticky-th text-white text-center text-center text-center text-center text-center text-center text-center text-center">
-                            <tr class="uppercase text-[9px] font-black text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
-                                <th class="px-4 py-3 border-b border-slate-700 text-center text-center text-center text-center text-center text-center">Rank</th>
-                                <th class="px-2 py-3 border-b border-slate-700 text-center text-center text-center text-center text-center text-center text-center">N</th>
-                                <th class="px-2 py-3 border-b border-slate-700 text-center text-center text-center text-center text-center text-center text-center">Buy%</th>
-                                <th class="px-2 py-3 border-b border-slate-700 text-center text-center text-center text-center text-center text-center text-center">Sell%</th>
-                                <th class="px-2 py-3 border-b border-slate-700 text-center text-center text-center text-center text-center text-center text-center">D</th>
-                                <th class="px-4 py-3 border-b border-slate-700 text-emerald-300 text-center text-center text-center text-center text-center text-center text-center">CAGR</th>
-                                <th class="px-4 py-3 border-b border-slate-700 text-red-300 text-center text-center text-center text-center text-center text-center text-center text-center">MDD</th>
-                                <th class="px-4 py-3 border-b border-slate-700 text-yellow-200 text-center text-center text-center text-center text-center text-center text-center text-center">GPR</th>
-                                <th class="px-4 py-3 border-b border-slate-700 text-purple-200 text-center text-center text-center text-center text-center text-center text-center text-center">Calmar</th>
-                                <th class="px-4 py-3 border-b border-slate-700 text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center">Pain</th>
-                                <th class="px-4 py-3 border-b border-slate-700 bg-slate-700 text-yellow-400 text-center text-center text-center text-center text-center text-center text-center text-center">PF</th>
-                                <th class="px-4 py-3 border-b border-slate-700 text-center text-center text-center text-center text-center text-center text-center text-center">적용 / 저장</th>
+                <div class="table-container">
+                    <table class="w-full text-center text-[11px] border-collapse">
+                        <thead class="sticky-th text-white">
+                            <tr class="uppercase text-[9px] font-black">
+                                <th class="px-4 py-3 border-b border-slate-700">Rank</th>
+                                <th class="px-2 py-3 border-b border-slate-700">N</th>
+                                <th class="px-2 py-3 border-b border-slate-700">Buy%</th>
+                                <th class="px-2 py-3 border-b border-slate-700">Sell%</th>
+                                <th class="px-2 py-3 border-b border-slate-700">D</th>
+                                <th class="px-4 py-3 border-b border-slate-700 text-emerald-300">CAGR</th>
+                                <th class="px-4 py-3 border-b border-slate-700 text-red-300">MDD</th>
+                                <th class="px-4 py-3 border-b border-slate-700 text-yellow-200">GPR</th>
+                                <th class="px-4 py-3 border-b border-slate-700 text-purple-200">Calmar</th>
+                                <th class="px-4 py-3 border-b border-slate-700 text-slate-400">Pain</th>
+                                <th class="px-4 py-3 border-b border-slate-700 bg-slate-700 text-yellow-400">PF</th>
+                                <th class="px-4 py-3 border-b border-slate-700">적용 / 저장</th>
                             </tr>
                         </thead>
-                        <tbody id="optBody" class="divide-y divide-slate-100 bg-white text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
-                            <tr><td colspan="12" class="py-20 text-slate-300 italic font-medium text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">설정 확인 후 최적화를 실행하세요.</td></tr>
+                        <tbody id="optBody" class="divide-y divide-slate-100 bg-white">
+                            <tr><td colspan="12" class="py-20 text-slate-300 italic font-medium text-center">설정 확인 후 최적화를 실행하세요.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -381,526 +382,646 @@
         <input type="hidden" id="csvUrl">
     </div>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script>
+    // =====================================================================
+    // ★ localStorage 기반 설정 저장/불러오기 (Firebase 대체)
+    // =====================================================================
+    const LS_INPUTS_KEY  = 'backtester_inputs';
+    const LS_PRESETS_KEY = 'backtester_presets';
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : '3day-strategy-app';
-        let currentUser = null;
-        let globalPresets = [];
+    function saveAllInputs() {
+        const data = {};
+        document.querySelectorAll('.persist').forEach(el => { data[el.id] = el.value; });
+        try {
+            localStorage.setItem(LS_INPUTS_KEY, JSON.stringify(data));
+            showIndicator('Settings Saved');
+        } catch(e) { console.warn('localStorage 저장 실패', e); }
+    }
 
-        // --- AUTH & LOAD ---
-        async function initAuth() {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
+    function loadSavedInputs() {
+        try {
+            const raw = localStorage.getItem(LS_INPUTS_KEY);
+            if (!raw) return;
+            const data = JSON.parse(raw);
+            Object.keys(data).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = data[id];
+            });
+        } catch(e) { console.warn('localStorage 불러오기 실패', e); }
+    }
+
+    function showIndicator(msg) {
+        const el = document.getElementById('saveIndicator');
+        el.innerText = msg;
+        el.style.display = 'block';
+        clearTimeout(window._indicatorTimer);
+        window._indicatorTimer = setTimeout(() => { el.style.display = 'none'; }, 2000);
+    }
+
+    // =====================================================================
+    // ★ localStorage 기반 프리셋 관리
+    // =====================================================================
+    function loadPresets() {
+        try {
+            const raw = localStorage.getItem(LS_PRESETS_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch(e) { return []; }
+    }
+
+    function savePresetsToStorage(presets) {
+        try { localStorage.setItem(LS_PRESETS_KEY, JSON.stringify(presets)); }
+        catch(e) { console.warn('프리셋 저장 실패', e); }
+    }
+
+    function renderPresetSelect() {
+        const presets = loadPresets();
+        const select = document.getElementById('presetSelect');
+        // 첫 번째 옵션만 남기고 초기화
+        while (select.options.length > 1) select.remove(1);
+        presets.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = p.name;
+            select.appendChild(opt);
+        });
+    }
+
+    window.loadSelectedPreset = function() {
+        const select = document.getElementById('presetSelect');
+        const presetId = select.value;
+        if (!presetId) return;
+        const presets = loadPresets();
+        const p = presets.find(x => x.id === presetId);
+        if (p) {
+            applyPresetToUI(p);
+            showIndicator('Preset Loaded');
+        }
+    };
+
+    window.deleteSelectedPreset = function() {
+        const select = document.getElementById('presetSelect');
+        const presetId = select.value;
+        if (!presetId) return;
+        if (!confirm('선택한 프리셋을 삭제하시겠습니까?')) return;
+        const presets = loadPresets().filter(x => x.id !== presetId);
+        savePresetsToStorage(presets);
+        renderPresetSelect();
+        select.value = '';
+        showIndicator('Preset Deleted');
+    };
+
+    // autoParams: 최적화 결과에서 저장할 때 전달, null이면 현재 UI 값 사용
+    window.openPresetModal = function(autoParams = null) {
+        const overlay = document.getElementById('modalOverlay');
+        const input   = document.getElementById('presetNameInput');
+        const btn     = document.getElementById('confirmSavePreset');
+        overlay.style.display = 'flex';
+        input.value = '';
+        input.focus();
+
+        // 이전에 등록된 이벤트 제거 후 새로 등록 (중복 방지)
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.addEventListener('click', function() {
+            const name = document.getElementById('presetNameInput').value.trim();
+            if (!name) return;
+
+            const params = autoParams ? {
+                N:         autoParams.N,
+                BuyP:      autoParams.BuyP,
+                SellP:     autoParams.SellP,
+                D:         autoParams.D,
+                seed:      document.getElementById('seed').value,
+                fee:       document.getElementById('fee').value,
+                startDate: autoParams.startDate || document.getElementById('startDate').value,
+                endDate:   autoParams.endDate   || document.getElementById('endDate').value
+            } : {
+                seed:      document.getElementById('seed').value,
+                fee:       document.getElementById('fee').value,
+                N:         document.getElementById('divN').value,
+                BuyP:      document.getElementById('paramBuyP').value,
+                SellP:     document.getElementById('paramSellP').value,
+                D:         document.getElementById('maxD').value,
+                startDate: document.getElementById('startDate').value,
+                endDate:   document.getElementById('endDate').value
+            };
+
+            const presets = loadPresets();
+            presets.push({ id: crypto.randomUUID(), name, ...params, createdAt: Date.now() });
+            savePresetsToStorage(presets);
+            renderPresetSelect();
+            window.closePresetModal();
+            showIndicator('Preset Saved');
+        });
+    };
+
+    window.closePresetModal = function() {
+        document.getElementById('modalOverlay').style.display = 'none';
+    };
+
+    function applyPresetToUI(p) {
+        document.getElementById('divN').value       = p.N        || 5;
+        document.getElementById('paramBuyP').value  = p.BuyP     || 1;
+        document.getElementById('paramSellP').value = p.SellP    || 1;
+        document.getElementById('maxD').value        = p.D        || 8;
+        if (p.seed)      document.getElementById('seed').value      = p.seed;
+        if (p.fee)       document.getElementById('fee').value       = p.fee;
+        if (p.startDate) document.getElementById('startDate').value = p.startDate;
+        if (p.endDate)   document.getElementById('endDate').value   = p.endDate;
+        window.clearBacktestResults();
+        window.switchTab('backtest');
+    }
+
+    // =====================================================================
+    // 앱 코어 로직
+    // =====================================================================
+    let equityChart = null;
+    let cachedData  = null;
+    let maxDataPrecision = 2;
+    let optimizationResults = [];
+
+    const TARGET_SHEET_ID = "1CY8hVPAXfPZZOfBgTaU5ygeLg4OXR14So_6dhfyoJjs";
+    const DEFAULT_URL = `https://docs.google.com/spreadsheets/d/${TARGET_SHEET_ID}/export?format=csv&gid=0`;
+
+    window.onload = async function() {
+        document.getElementById('csvUrl').value = DEFAULT_URL;
+        loadSavedInputs();    // localStorage에서 이전 입력값 복원
+        renderPresetSelect(); // 저장된 프리셋 목록 복원
+
+        // 입력값 변경 시 자동 저장
+        document.querySelectorAll('.persist').forEach(el => {
+            el.addEventListener('change', saveAllInputs);
+        });
+
+        await loadInitialData();
+    };
+
+    window.switchTab = function(tab) {
+        document.getElementById('tabBacktest').classList.toggle('hidden', tab !== 'backtest');
+        document.getElementById('tabOptimize').classList.toggle('hidden', tab !== 'optimize');
+        document.getElementById('btnTabBacktest').classList.toggle('tab-active', tab === 'backtest');
+        document.getElementById('btnTabOptimize').classList.toggle('tab-active', tab === 'optimize');
+    };
+
+    function roundTo(val, places) {
+        const factor = Math.pow(10, places);
+        return Math.round(val * factor) / factor;
+    }
+
+    async function loadInitialData() {
+        try {
+            const response = await fetch(`${DEFAULT_URL}&t=${Date.now()}`);
+            const csvText  = await response.text();
+            const rawLines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
+            let allData = [], maxDetectedPlaces = 0;
+
+            for (let i = 0; i < rawLines.length; i++) {
+                const cols = rawLines[i].split(',').map(c => c.replace(/"/g, '').trim());
+                if (cols.length < 2) continue;
+                const dateObj = new Date(cols[0]);
+                const rawCloseStr = cols[1];
+                const closeVal = parseFloat(rawCloseStr);
+                if (!isNaN(dateObj.getTime()) && !isNaN(closeVal)) {
+                    if (rawCloseStr.includes('.')) {
+                        const dp = rawCloseStr.split('.')[1].length;
+                        if (dp > maxDetectedPlaces) maxDetectedPlaces = dp;
+                    }
+                    allData.push({ dateObj, dateStr: dateObj.toISOString().split('T')[0], close: closeVal, rawClose: rawCloseStr });
+                }
             }
+
+            maxDataPrecision = maxDetectedPlaces;
+            allData.sort((a, b) => a.dateObj - b.dateObj);
+            cachedData = allData;
+
+            document.getElementById('dataPeriodDisplay').innerText =
+                `SOXL 데이터 준비됨: ${allData[0].dateStr} ~ ${allData[allData.length-1].dateStr} (정밀도: 종가 자릿수+2자리)`;
+            document.getElementById('dataStatusDot').classList.replace('bg-slate-300', 'bg-emerald-500');
+
+            // 날짜 필드 기본값 (localStorage에서 불러온 값 없을 때만)
+            if (!document.getElementById('startDate').value)
+                document.getElementById('startDate').value = '2021-01-01';
+            if (!document.getElementById('endDate').value)
+                document.getElementById('endDate').value = allData[allData.length-1].dateStr;
+            if (!document.getElementById('optStartDate').value)
+                document.getElementById('optStartDate').value = '2014-01-01';
+            if (!document.getElementById('optEndDate').value)
+                document.getElementById('optEndDate').value = allData[allData.length-1].dateStr;
+
+        } catch(err) {
+            console.error('Data Load Error:', err);
+            document.getElementById('dataPeriodDisplay').innerText = '데이터 로드 실패 — Google Sheets CORS 오류일 수 있습니다.';
+        }
+    }
+
+    function runSimulation(params, marketData, allFullData) {
+        const { seed, fee, N, BuyP, SellP, D } = params;
+        const calcP = maxDataPrecision + 2;
+        let cash = seed, holdings = [], history = [], strategyDrawdowns = [], dailyLogs = [];
+        let maxEquity = seed, mdd = 0, tradeCount = 0, wins = 0, losses = 0, totalProfit = 0, totalLoss = 0;
+        const K_buy  = 1 + (BuyP  / 100);
+        const K_sell = 1 + (SellP / 100);
+        const startMarketDate = marketData[0].dateStr;
+        const globalStartIndex = allFullData.findIndex(d => d.dateStr === startMarketDate);
+
+        for (let i = 0; i < marketData.length; i++) {
+            const today = marketData[i];
+            const globalIdx = globalStartIndex + i;
+            const prev  = allFullData[globalIdx - 1];
+            const prev2 = allFullData[globalIdx - 2];
+            let buyLimit = -1, sellLimit = 999999, refPrice = 0;
+
+            if (prev && prev2) {
+                const prevSum = prev.close + prev2.close;
+                buyLimit  = roundTo((prevSum * K_buy)  / (3 - K_buy),  calcP);
+                sellLimit = roundTo((prevSum * K_sell) / (3 - K_sell), calcP);
+                const pRate = BuyP / 100;
+                refPrice = roundTo((prevSum * (1 + pRate)) / (2 - pRate), calcP);
+            }
+
+            let event = '관망', unitsBought = 0, realized = 0;
+
+            if (holdings.length > 0) {
+                const isProfitTargetMet = (today.close >= sellLimit);
+                const isAnyPotExpired   = (globalIdx - holdings[0].globalBuyIdx >= D);
+                if (isProfitTargetMet || isAnyPotExpired) {
+                    const totalQty     = holdings.reduce((s, h) => s + h.qty, 0);
+                    const totalBuyCost = holdings.reduce((s, h) => s + h.totalCost, 0);
+                    const proceeds     = roundTo((totalQty * today.close) * (1 - fee), calcP);
+                    realized = roundTo(proceeds - totalBuyCost, calcP);
+                    if (realized > 0) { wins++;   totalProfit += realized;         event = isProfitTargetMet ? '전량익절'     : '만기익절'; }
+                    else              { losses++; totalLoss   += Math.abs(realized); event = isProfitTargetMet ? '전량매도(손실)' : '만기손절'; }
+                    cash = roundTo(cash + proceeds, calcP);
+                    holdings = [];
+                    tradeCount++;
+                }
+            }
+
+            if (holdings.length < N && !event.includes('매도') && !event.includes('절')) {
+                const buyTriggered = (holdings.length === 0)
+                    ? (prev && today.close < prev.close)
+                    : (buyLimit > 0 && today.close <= buyLimit);
+                if (buyTriggered) {
+                    const remainingSlots = N - holdings.length;
+                    const unitBudget     = cash / remainingSlots;
+                    const divisorPrice   = refPrice > 0 ? refPrice : today.close;
+                    const qty = Math.floor(unitBudget / (divisorPrice * (1 + fee)));
+                    if (qty > 0) {
+                        const actualCost = roundTo(qty * today.close * (1 + fee), calcP);
+                        cash = roundTo(cash - actualCost, calcP);
+                        holdings.push({ qty, price: today.close, totalCost: actualCost, globalBuyIdx: globalIdx, buyDate: today.dateStr });
+                        unitsBought = qty;
+                        event = (event === '관망') ? '매수' : event + '&매수';
+                    }
+                }
+            }
+
+            const curHoldQty = holdings.reduce((s, h) => s + h.qty, 0);
+            const curEquity  = roundTo(cash + (curHoldQty * today.close), calcP);
+            history.push(curEquity);
+            if (curEquity > maxEquity) maxEquity = curEquity;
+            const curDD = roundTo(((maxEquity - curEquity) / maxEquity) * 100, 4);
+            strategyDrawdowns.push(-curDD);
+            if (curDD > mdd) mdd = curDD;
+
+            dailyLogs.push({ date: today.dateStr, close: today.close, rawClose: today.rawClose,
+                change: prev ? ((today.close - prev.close) / prev.close * 100) : 0,
+                bought: unitsBought, port: `${holdings.length}/${N}`,
+                equity: curEquity, cash, realized, event, dd: curDD });
         }
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                await loadSavedInputs();
-                setupPresetListener();
+        const finalVal   = history[history.length - 1];
+        const firstDate  = new Date(marketData[0].dateStr);
+        const lastDate   = new Date(marketData[marketData.length - 1].dateStr);
+        const diffYears  = Math.max((lastDate - firstDate) / (1000 * 60 * 60 * 24 * 365.25), 0.1);
+        const totalRet   = ((finalVal - seed) / seed) * 100;
+        const cagr       = (Math.pow(finalVal / seed, 1 / diffYears) - 1) * 100;
+        const pf         = totalLoss !== 0 ? (totalProfit / totalLoss) : (totalProfit > 0 ? 99 : 0);
+        const painIndex  = strategyDrawdowns.reduce((s, v) => s + Math.abs(v), 0) / Math.max(strategyDrawdowns.length, 1);
+
+        return { finalVal, totalRet, cagr, mdd, pf, painIndex,
+            gpr: painIndex !== 0 ? cagr / painIndex : 0,
+            calmar: mdd !== 0 ? cagr / mdd : 0,
+            winRate: tradeCount > 0 ? (wins / tradeCount) * 100 : 0,
+            history, strategyDrawdowns, dailyLogs,
+            labels: marketData.map(d => d.dateStr),
+            prices: marketData.map(d => d.close) };
+    }
+
+    window.runBacktest = function() {
+        if (!cachedData) return;
+        saveAllInputs();
+        const startStr   = document.getElementById('startDate').value;
+        const endStr     = document.getElementById('endDate').value;
+        const marketData = cachedData.filter(item =>
+            (!startStr || item.dateStr >= startStr) && (!endStr || item.dateStr <= endStr));
+        if (marketData.length < 5) { alert('기간 내 데이터가 부족합니다.'); return; }
+
+        const params = {
+            seed:  parseFloat(document.getElementById('seed').value),
+            fee:   parseFloat(document.getElementById('fee').value) / 100,
+            N:     parseInt(document.getElementById('divN').value),
+            BuyP:  parseFloat(document.getElementById('paramBuyP').value),
+            SellP: parseFloat(document.getElementById('paramSellP').value),
+            D:     parseInt(document.getElementById('maxD').value)
+        };
+        const res = runSimulation(params, marketData, cachedData);
+        displayBacktestResults(res, params);
+    };
+
+    function displayBacktestResults(res, params) {
+        document.getElementById('statsSection').classList.remove('hidden');
+        document.getElementById('annualSection').classList.remove('hidden');
+        document.getElementById('heatmapSection').classList.remove('hidden');
+
+        document.getElementById('statFinal').innerText    = '$' + res.finalVal.toLocaleString(undefined, { maximumFractionDigits: 0 });
+        document.getElementById('statReturn').innerText   = `${res.totalRet.toFixed(0)}%`;
+        document.getElementById('statCAGR').innerText     = `${res.cagr.toFixed(2)}%`;
+        document.getElementById('statMDD').innerText      = `-${res.mdd.toFixed(2)}%`;
+        document.getElementById('statWinRate').innerText  = `${res.winRate.toFixed(1)}%`;
+        document.getElementById('statPF').innerText       = res.pf.toFixed(2);
+        document.getElementById('statPain').innerText     = res.painIndex.toFixed(2);
+        document.getElementById('statGPR').innerText      = res.gpr.toFixed(2);
+        document.getElementById('statCalmar').innerText   = res.calmar.toFixed(2);
+
+        // --- 연도별 성과 ---
+        const annualBody = document.getElementById('annualBody');
+        const heatmapBody = document.getElementById('heatmapBody');
+        let years = {}, monthlyMap = {};
+
+        res.dailyLogs.forEach(log => {
+            const year  = log.date.substring(0, 4);
+            const month = parseInt(log.date.substring(5, 7));
+            if (!years[year]) years[year] = { startEquity: 0, endEquity: 0, realizedSum: 0, peak: 0, maxDD: 0 };
+            years[year].endEquity    = log.equity;
+            years[year].realizedSum += log.realized;
+            if (log.equity > years[year].peak) years[year].peak = log.equity;
+            const dd = ((years[year].peak - log.equity) / years[year].peak) * 100;
+            if (dd > years[year].maxDD) years[year].maxDD = dd;
+            if (!monthlyMap[year]) monthlyMap[year] = {};
+            monthlyMap[year][month] = log.equity;
+        });
+
+        const sortedYears = Object.keys(years).sort();
+        let prevEndEquity = params.seed;
+
+        annualBody.innerHTML = sortedYears.map(year => {
+            const y = years[year];
+            const ret = ((y.endEquity - prevEndEquity) / prevEndEquity) * 100;
+            const html = `<tr>
+                <td class="px-4 py-1.5 font-bold text-slate-900 text-center">${year}</td>
+                <td class="px-4 py-1.5 text-center text-xs">$${prevEndEquity.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                <td class="px-4 py-1.5 font-semibold text-center text-xs">$${y.endEquity.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                <td class="px-4 py-1.5 font-bold ${ret >= 0 ? 'text-red-600' : 'text-blue-600'} text-center">${ret >= 0 ? '+' : ''}${ret.toFixed(2)}%</td>
+                <td class="px-4 py-1.5 text-blue-500 font-bold text-center">-${y.maxDD.toFixed(2)}%</td>
+                <td class="px-4 py-1.5 font-bold text-xs text-center">$${y.realizedSum.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+            </tr>`;
+            prevEndEquity = y.endEquity;
+            return html;
+        }).join('');
+
+        // --- 히트맵 ---
+        let heatmapHtml = '';
+        let rollingPrevEquity = params.seed;
+        sortedYears.forEach(year => {
+            let rowHtml = `<tr class="border-b border-slate-50 text-center"><td class="bg-slate-50 font-black text-slate-900 text-[11px]">${year}</td>`;
+            const yearStartEq = rollingPrevEquity;
+            for (let m = 1; m <= 12; m++) {
+                const monthEndEq = monthlyMap[year][m];
+                if (monthEndEq) {
+                    const mRet = ((monthEndEq - rollingPrevEquity) / rollingPrevEquity) * 100;
+                    let bgColor = 'transparent', textColor = '#1e293b';
+                    if (mRet > 0) {
+                        const opacity = Math.min(0.1 + (Math.min(mRet / 10, 1) * 0.85), 0.95);
+                        bgColor = `rgba(239,68,68,${opacity.toFixed(2)})`; textColor = opacity > 0.5 ? 'white' : '#7f1d1d';
+                    } else if (mRet < 0) {
+                        const opacity = Math.min(0.1 + (Math.min(Math.abs(mRet) / 10, 1) * 0.85), 0.95);
+                        bgColor = `rgba(16,185,129,${opacity.toFixed(2)})`; textColor = opacity > 0.5 ? 'white' : '#064e3b';
+                    }
+                    rowHtml += `<td style="background-color:${bgColor};color:${textColor}" class="text-center">${mRet >= 0 ? '+' : ''}${mRet.toFixed(1)}%</td>`;
+                    rollingPrevEquity = monthEndEq;
+                } else {
+                    rowHtml += `<td class="text-slate-200 font-normal text-center">-</td>`;
+                }
+            }
+            const annualRet = ((years[year].endEquity - yearStartEq) / yearStartEq) * 100;
+            rowHtml += `<td class="bg-slate-50 font-black text-center ${annualRet >= 0 ? 'text-red-600' : 'text-blue-600'}">${annualRet >= 0 ? '+' : ''}${annualRet.toFixed(1)}%</td></tr>`;
+            heatmapHtml += rowHtml;
+        });
+        heatmapBody.innerHTML = heatmapHtml;
+
+        // --- 차트 ---
+        if (equityChart) equityChart.destroy();
+        equityChart = new Chart(document.getElementById('equityChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: res.labels,
+                datasets: [
+                    { label: 'MDD (%)',   data: res.strategyDrawdowns, fill: true, backgroundColor: 'rgba(239,68,68,0.15)', borderColor: 'rgba(239,68,68,0.4)', borderWidth: 1, pointRadius: 0, yAxisID: 'yMDD', tension: 0.1 },
+                    { label: 'SOXL 종가', data: res.prices,            borderColor: 'rgba(148,163,184,0.3)', borderWidth: 1.5, pointRadius: 0, yAxisID: 'yL',   tension: 0.1 },
+                    { label: '전략 자산', data: res.history,            borderColor: '#2563eb',               borderWidth: 2.5, pointRadius: 0, yAxisID: 'yR',   tension: 0.1 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend:  { display: true, position: 'top', labels: { font: { weight: 'bold', size: 11 } } },
+                    tooltip: { backgroundColor: 'rgba(15,23,42,0.9)', padding: 12 }
+                },
+                scales: {
+                    x:    { ticks: { maxTicksLimit: 12, font: { size: 10 } }, grid: { display: false } },
+                    yL:   { type: 'linear', position: 'left',  title: { display: true, text: 'Price ($)',      font: { size: 10, weight: 'bold' } }, ticks: { font: { size: 9 } } },
+                    yR:   { type: 'linear', position: 'right', title: { display: true, text: 'Equity ($)',     font: { size: 10, weight: 'bold' } }, ticks: { font: { size: 9 } }, grid: { drawOnChartArea: false } },
+                    yMDD: { type: 'linear', position: 'right', min: -100, max: 0, title: { display: true, text: 'Drawdown (%)', font: { size: 10, weight: 'bold' }, color: '#ef4444' }, ticks: { font: { size: 8 }, color: '#ef4444' }, grid: { display: false } }
+                }
             }
         });
 
-        initAuth();
+        // --- 거래 로그 ---
+        const logBody = document.getElementById('tradeLog');
+        logBody.innerHTML = res.dailyLogs.map(l => {
+            const isProfitSell = l.event.includes('익절');
+            const isLossSell   = l.event.includes('손절') || l.event.includes('손실');
+            const isBuy        = l.event.includes('매수');
+            let eventClass = 'text-slate-400';
+            if (isProfitSell) eventClass = 'bg-red-600 text-white px-2 py-0.5 rounded font-black';
+            else if (isLossSell) eventClass = 'bg-blue-600 text-white px-2 py-0.5 rounded font-black';
+            else if (isBuy)      eventClass = 'bg-slate-700 text-white px-2 py-0.5 rounded font-black';
+            return `<tr class="hover:bg-slate-50 border-b text-center">
+                <td class="px-3 py-2 font-mono text-left text-xs">${l.date}</td>
+                <td class="px-3 py-2 text-right font-mono text-xs">$${l.rawClose}</td>
+                <td class="px-3 py-2 text-right ${l.change >= 0 ? 'text-red-600' : 'text-blue-600'} font-bold text-xs">${l.change.toFixed(2)}%</td>
+                <td class="px-3 py-2 text-right text-slate-600 font-bold text-xs">${l.bought || '-'}</td>
+                <td class="px-3 py-2 text-center font-bold text-xs">${l.port}</td>
+                <td class="px-3 py-2 text-right font-bold text-slate-800 text-xs">$${l.equity.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                <td class="px-3 py-2 text-right font-black ${l.realized > 0 ? 'text-red-600' : l.realized < 0 ? 'text-blue-600' : ''} text-xs">${l.realized ? l.realized.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '-'}</td>
+                <td class="px-3 py-2 text-center"><span class="text-[9px] uppercase ${eventClass}">${l.event}</span></td>
+                <td class="px-3 py-2 text-right font-bold text-red-400 bg-red-50/20 text-xs">${l.dd > 0 ? '-' : ''}${l.dd.toFixed(2)}%</td>
+            </tr>`;
+        }).join('');
+        document.getElementById('logCount').innerText = `${res.dailyLogs.length} 거래일 기록 완료`;
+    }
 
-        // --- INPUTS AUTO-SAVE ---
-        async function saveAllInputs() {
-            if (!currentUser) return;
-            const data = {};
-            document.querySelectorAll('.persist').forEach(el => {
-                data[el.id] = el.value;
-            });
-            try {
-                const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'last_inputs');
-                await setDoc(userDocRef, data);
-                const indicator = document.getElementById('saveIndicator');
-                indicator.style.display = 'block';
-                setTimeout(() => { indicator.style.display = 'none'; }, 2000);
-            } catch (e) { console.error("Save error", e); }
-        }
+    // =====================================================================
+    // ★ 버그 수정: window.runOptimizer 로 올바르게 할당
+    // =====================================================================
+    window.runOptimizer = async function() {
+        if (!cachedData) return;
+        saveAllInputs();
 
-        async function loadSavedInputs() {
-            if (!currentUser) return;
-            try {
-                const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'last_inputs');
-                const docSnap = await getDoc(userDocRef);
-                if (docSnap.exists()) {
-                    const savedData = docSnap.data();
-                    Object.keys(savedData).forEach(id => {
-                        const el = document.getElementById(id);
-                        if (el) el.value = savedData[id];
-                    });
-                }
-            } catch (e) { console.error("Load error", e); }
-        }
+        const startStr   = document.getElementById('optStartDate').value;
+        const endStr     = document.getElementById('optEndDate').value;
+        const marketData = cachedData.filter(item =>
+            (!startStr || item.dateStr >= startStr) && (!endStr || item.dateStr <= endStr));
+        if (marketData.length < 5) { alert('기간 내 데이터 부족'); return; }
 
-        // --- PRESET LOGIC ---
-        function setupPresetListener() {
-            const presetsCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'presets');
-            onSnapshot(presetsCol, (snapshot) => {
-                const presets = [];
-                snapshot.forEach(doc => presets.push({ id: doc.id, ...doc.data() }));
-                globalPresets = presets;
-                renderPresetSelect(presets);
-            }, (err) => console.error("Preset Listener Error", err));
-        }
-
-        function renderPresetSelect(presets) {
-            const select = document.getElementById('presetSelect');
-            while (select.options.length > 1) { select.remove(1); }
-            presets.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.textContent = p.name;
-                select.appendChild(opt);
-            });
-        }
-
-        window.loadSelectedPreset = function() {
-            const select = document.getElementById('presetSelect');
-            const presetId = select.value;
-            if (!presetId) return;
-            const p = globalPresets.find(item => item.id === presetId);
-            if (p) {
-                window.applyPresetToUI(p);
-                const indicator = document.getElementById('saveIndicator');
-                indicator.innerText = "Preset Loaded";
-                indicator.style.display = 'block';
-                setTimeout(() => { indicator.style.display = 'none'; indicator.innerText = "Settings Saved"; }, 1500);
-            }
+        const totalIter = parseInt(document.getElementById('optIter').value);
+        const seed = parseFloat(document.getElementById('seed').value);
+        const fee  = parseFloat(document.getElementById('fee').value) / 100;
+        const filters = {
+            cagr:   parseFloat(document.getElementById('filterCAGR').value),
+            mdd:    parseFloat(document.getElementById('filterMDD').value),
+            calmar: parseFloat(document.getElementById('filterCalmar').value),
+            pain:   parseFloat(document.getElementById('filterPain').value)
+        };
+        const ranges = {
+            n:    [parseInt(document.getElementById('optNMin').value),   parseInt(document.getElementById('optNMax').value)],
+            buy:  [parseFloat(document.getElementById('optBuyMin').value), parseFloat(document.getElementById('optBuyMax').value)],
+            sell: [parseFloat(document.getElementById('optSellMin').value), parseFloat(document.getElementById('optSellMax').value)],
+            d:    [parseInt(document.getElementById('optDMin').value),   parseInt(document.getElementById('optDMax').value)]
         };
 
-        window.deleteSelectedPreset = async function() {
-            const select = document.getElementById('presetSelect');
-            const presetId = select.value;
-            if (!presetId) return;
-            if (confirm("선택한 프리셋을 삭제하시겠습니까?")) {
-                const presetRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'presets', presetId);
-                await deleteDoc(presetRef);
-                select.value = "";
-            }
-        };
+        const nCount    = ranges.n[1]    - ranges.n[0]    + 1;
+        const buyCount  = Math.round((ranges.buy[1]  - ranges.buy[0])  * 10) + 1;
+        const sellCount = Math.round((ranges.sell[1] - ranges.sell[0]) * 10) + 1;
+        const dCount    = ranges.d[1]    - ranges.d[0]    + 1;
+        const totalCombinations = nCount * buyCount * sellCount * dCount;
 
-        async function savePreset(name, params) {
-            if (!currentUser) return;
-            const presetId = crypto.randomUUID();
-            const presetRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'presets', presetId);
-            const coreParams = {
-                N: params.N,
-                BuyP: params.BuyP,
-                SellP: params.SellP,
-                D: params.D,
-                seed: params.seed,
-                fee: params.fee,
-                startDate: params.startDate,
-                endDate: params.endDate
-            };
-            await setDoc(presetRef, { name, ...coreParams, createdAt: Date.now() });
-            const indicator = document.getElementById('saveIndicator');
-            indicator.innerText = "Preset Saved";
-            indicator.style.display = 'block';
-            setTimeout(() => { indicator.style.display = 'none'; indicator.innerText = "Settings Saved"; }, 2000);
-        }
+        const btn             = document.getElementById('btnRunOptimizer');
+        const progressSection = document.getElementById('optProgressSection');
+        const progressBar     = document.getElementById('optProgressBar');
+        const progressText    = document.getElementById('optProgressText');
+        const progressDetail  = document.getElementById('optProgressDetail');
 
-        // [수정] 모달 열기 함수를 전역에서 안정적으로 호출 가능하도록 수정
-        window.openPresetModal = function(autoParams = null) {
-            const overlay = document.getElementById('modalOverlay');
-            const input = document.getElementById('presetNameInput');
-            const confirmBtn = document.getElementById('confirmSavePreset');
-            overlay.style.display = 'flex';
-            input.value = "";
-            input.focus();
-            confirmBtn.onclick = async () => {
-                const name = input.value.trim();
-                if (!name) return;
-                let params;
-                if (autoParams) {
-                    params = {
-                        N: autoParams.N, 
-                        BuyP: autoParams.BuyP, 
-                        SellP: autoParams.SellP, 
-                        D: autoParams.D,
-                        seed: document.getElementById('seed').value, 
-                        fee: document.getElementById('fee').value,
-                        startDate: autoParams.startDate || document.getElementById('startDate').value,
-                        endDate: autoParams.endDate || document.getElementById('endDate').value
-                    };
-                } else {
-                    params = {
-                        seed: document.getElementById('seed').value, 
-                        fee: document.getElementById('fee').value,
-                        N: document.getElementById('divN').value, 
-                        BuyP: document.getElementById('paramBuyP').value,
-                        SellP: document.getElementById('paramSellP').value, 
-                        D: document.getElementById('maxD').value,
-                        startDate: document.getElementById('startDate').value, 
-                        endDate: document.getElementById('endDate').value
-                    };
-                }
-                await savePreset(name, params);
-                window.closePresetModal();
-            };
-        };
+        btn.disabled = true;
+        progressSection.classList.remove('hidden');
+        optimizationResults = [];
 
-        window.closePresetModal = function() {
-            document.getElementById('modalOverlay').style.display = 'none';
-        };
+        const CHUNK_SIZE = 50;
+        for (let i = 0; i < totalIter; i += CHUNK_SIZE) {
+            const currentEnd = Math.min(i + CHUNK_SIZE, totalIter);
+            const percent    = Math.round((currentEnd / totalIter) * 100);
+            progressBar.style.width   = `${percent}%`;
+            progressText.innerText    = `연산 진행률: ${percent}%`;
+            progressDetail.innerText  = `${currentEnd} / ${totalIter} (총조합수: ${totalCombinations.toLocaleString()})`;
 
-        window.applyPresetToUI = function(p) {
-            document.getElementById('divN').value = p.N || p.divN || 5;
-            document.getElementById('paramBuyP').value = p.BuyP || p.paramBuyP || 1;
-            document.getElementById('paramSellP').value = p.SellP || p.paramSellP || 1;
-            document.getElementById('maxD').value = p.D || p.maxD || 8;
-            if (p.seed) document.getElementById('seed').value = p.seed;
-            if (p.fee) document.getElementById('fee').value = p.fee;
-            if (p.startDate) document.getElementById('startDate').value = p.startDate;
-            if (p.endDate) document.getElementById('endDate').value = p.endDate;
-            
-            window.clearBacktestResults();
-            window.switchTab('backtest');
-        };
+            await new Promise(resolve => setTimeout(resolve, 0));
 
-        window.saveAllInputs = saveAllInputs;
-    </script>
+            for (let j = i; j < currentEnd; j++) {
+                const N    = Math.floor(Math.random() * (ranges.n[1] - ranges.n[0] + 1)) + ranges.n[0];
+                const BuyP = parseFloat((Math.floor(Math.random() * ((ranges.buy[1]  - ranges.buy[0])  * 10 + 1)) / 10 + ranges.buy[0]).toFixed(1));
+                const SellP= parseFloat((Math.floor(Math.random() * ((ranges.sell[1] - ranges.sell[0]) * 10 + 1)) / 10 + ranges.sell[0]).toFixed(1));
+                const D    = Math.floor(Math.random() * (ranges.d[1] - ranges.d[0] + 1)) + ranges.d[0];
 
-    <script>
-        let equityChart = null;
-        let cachedData = null;
-        let maxDataPrecision = 2; 
-        let optimizationResults = [];
-        const TARGET_SHEET_ID = "1CY8hVPAXfPZZOfBgTaU5ygeLg4OXR14So_6dhfyoJjs";
-        const DEFAULT_URL = `https://docs.google.com/spreadsheets/d/${TARGET_SHEET_ID}/export?format=csv&gid=0`;
-
-        window.onload = function() {
-            document.getElementById('csvUrl').value = DEFAULT_URL;
-            loadInitialData(); 
-        };
-
-        window.switchTab = function(tab) {
-            document.getElementById('tabBacktest').classList.toggle('hidden', tab !== 'backtest');
-            document.getElementById('tabOptimize').classList.toggle('hidden', tab !== 'optimize');
-            document.getElementById('btnTabBacktest').classList.toggle('tab-active', tab === 'backtest');
-            document.getElementById('btnTabOptimize').classList.toggle('tab-active', tab === 'optimize');
-        }
-
-        function roundTo(val, places) {
-            const factor = Math.pow(10, places);
-            return Math.round(val * factor) / factor;
-        }
-
-        async function loadInitialData() {
-            try {
-                const response = await fetch(`${DEFAULT_URL}&t=${Date.now()}`);
-                const csvText = await response.text();
-                const rawLines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
-                let allData = [], maxDetectedPlaces = 0;
-                for (let i = 0; i < rawLines.length; i++) {
-                    const cols = rawLines[i].split(',').map(c => c.replace(/"/g, '').trim());
-                    if (cols.length < 2) continue;
-                    const dateObj = new Date(cols[0]);
-                    const rawCloseStr = cols[1]; 
-                    const closeVal = parseFloat(rawCloseStr);
-                    if (!isNaN(dateObj.getTime()) && !isNaN(closeVal)) {
-                        if (rawCloseStr.includes('.')) {
-                            const decimalPlaces = rawCloseStr.split('.')[1].length;
-                            if (decimalPlaces > maxDetectedPlaces) maxDetectedPlaces = decimalPlaces;
-                        }
-                        allData.push({ dateObj, dateStr: dateObj.toISOString().split('T')[0], close: closeVal, rawClose: rawCloseStr });
-                    }
-                }
-                maxDataPrecision = maxDetectedPlaces;
-                allData.sort((a, b) => a.dateObj - b.dateObj);
-                cachedData = allData;
-                document.getElementById('dataPeriodDisplay').innerText = `SOXL 데이터 준비됨: ${allData[0].dateStr} ~ ${allData[allData.length-1].dateStr} (정밀도: 종가 자릿수+2자리)`;
-                document.getElementById('dataStatusDot').classList.replace('bg-slate-300', 'bg-emerald-500');
-                if (!document.getElementById('startDate').value) document.getElementById('startDate').value = "2021-01-01";
-                if (!document.getElementById('endDate').value) document.getElementById('endDate').value = allData[allData.length-1].dateStr;
-                if (!document.getElementById('optStartDate').value) document.getElementById('optStartDate').value = "2014-01-01";
-                if (!document.getElementById('optEndDate').value) document.getElementById('optEndDate').value = allData[allData.length-1].dateStr;
-            } catch (err) { console.error("Data Load Error:", err); }
-        }
-
-        function runSimulation(params, marketData, allFullData) {
-            const { seed, fee, N, BuyP, SellP, D } = params;
-            const calcP = maxDataPrecision + 2;
-            let cash = seed, holdings = [], history = [], strategyDrawdowns = [], dailyLogs = [];
-            let maxEquity = seed, mdd = 0, tradeCount = 0, wins = 0, losses = 0, totalProfit = 0, totalLoss = 0;
-            const K_buy = 1 + (BuyP / 100);
-            const K_sell = 1 + (SellP / 100);
-            const startMarketDate = marketData[0].dateStr;
-            const globalStartIndex = allFullData.findIndex(d => d.dateStr === startMarketDate);
-            for (let i = 0; i < marketData.length; i++) {
-                const today = marketData[i];
-                const globalIdx = globalStartIndex + i;
-                const prev = allFullData[globalIdx - 1];
-                const prev2 = allFullData[globalIdx - 2];
-                let buyLimit = -1, sellLimit = 999999, refPrice = 0;
-                if (prev && prev2) {
-                    const prevSum = prev.close + prev2.close;
-                    buyLimit = roundTo((prevSum * K_buy) / (3 - K_buy), calcP);
-                    sellLimit = roundTo((prevSum * K_sell) / (3 - K_sell), calcP);
-                    const pRate = BuyP / 100;
-                    refPrice = roundTo((prevSum * (1 + pRate)) / (2 - pRate), calcP);
-                }
-                let event = "관망", unitsBought = 0, realized = 0;
-                if (holdings.length > 0) {
-                    const isProfitTargetMet = (today.close >= sellLimit);
-                    const isAnyPotExpired = (globalIdx - holdings[0].globalBuyIdx >= D);
-                    if (isProfitTargetMet || isAnyPotExpired) {
-                        const totalQty = holdings.reduce((s, h) => s + h.qty, 0);
-                        const totalBuyCost = holdings.reduce((s, h) => s + h.totalCost, 0);
-                        const proceeds = roundTo((totalQty * today.close) * (1 - fee), calcP);
-                        realized = roundTo(proceeds - totalBuyCost, calcP);
-                        if (realized > 0) { wins++; totalProfit += realized; event = isProfitTargetMet ? "전량익절" : "만기익절"; }
-                        else { losses++; totalLoss += Math.abs(realized); event = isProfitTargetMet ? "전량매도(손실)" : "만기손절"; }
-                        cash = roundTo(cash + proceeds, calcP); holdings = []; tradeCount++;
-                    }
-                }
-                if (holdings.length < N && !event.includes("매도") && !event.includes("절")) {
-                    let buyTriggered = (holdings.length === 0) ? (prev && today.close < prev.close) : (buyLimit > 0 && today.close <= buyLimit);
-                    if (buyTriggered) {
-                        const remainingSlots = N - holdings.length;
-                        const unitBudget = cash / remainingSlots;
-                        const divisorPrice = refPrice > 0 ? refPrice : today.close;
-                        const qty = Math.floor(unitBudget / (divisorPrice * (1 + fee)));
-                        if (qty > 0) {
-                            const actualCost = roundTo(qty * today.close * (1 + fee), calcP);
-                            cash = roundTo(cash - actualCost, calcP);
-                            holdings.push({ qty, price: today.close, totalCost: actualCost, globalBuyIdx: globalIdx, buyDate: today.dateStr });
-                            unitsBought = qty; event = (event === "관망") ? "매수" : event + "&매수";
-                        }
-                    }
-                }
-                const curHoldQty = holdings.reduce((s, h) => s + h.qty, 0);
-                const curEquity = roundTo(cash + (curHoldQty * today.close), calcP);
-                history.push(curEquity); if (curEquity > maxEquity) maxEquity = curEquity;
-                const curDD = roundTo(((maxEquity - curEquity) / maxEquity) * 100, 4); strategyDrawdowns.push(-curDD);
-                if (curDD > mdd) mdd = curDD;
-                dailyLogs.push({ date: today.dateStr, close: today.close, rawClose: today.rawClose, change: prev ? ((today.close-prev.close)/prev.close*100) : 0, bought: unitsBought, port: `${holdings.length}/${N}`, equity: curEquity, cash, realized, event, dd: curDD });
-            }
-            const finalVal = history[history.length - 1];
-            const firstDate = new Date(marketData[0].dateStr), lastDate = new Date(marketData[marketData.length - 1].dateStr);
-            const diffYears = Math.max((lastDate - firstDate) / (1000 * 60 * 60 * 24 * 365.25), 0.1);
-            const totalRet = ((finalVal - seed) / seed) * 100;
-            const cagr = (Math.pow(finalVal / seed, 1 / diffYears) - 1) * 100;
-            const pf = totalLoss !== 0 ? (totalProfit / totalLoss) : (totalProfit > 0 ? 99 : 0);
-            const painIndex = strategyDrawdowns.reduce((s, v) => s + Math.abs(v), 0) / Math.max(strategyDrawdowns.length, 1);
-            return { finalVal, totalRet, cagr, mdd, pf, painIndex, gpr: painIndex !== 0 ? (cagr / painIndex) : 0, calmar: mdd !== 0 ? cagr / mdd : 0, winRate: tradeCount > 0 ? (wins/tradeCount)*100 : 0, history, strategyDrawdowns, dailyLogs, labels: marketData.map(d => d.dateStr), prices: marketData.map(d => d.close) };
-        }
-
-        window.runBacktest = function() {
-            if (!cachedData) return;
-            if (window.saveAllInputs) window.saveAllInputs();
-            const startStr = document.getElementById('startDate').value, endStr = document.getElementById('endDate').value;
-            const marketData = cachedData.filter(item => (!startStr || item.dateStr >= startStr) && (!endStr || item.dateStr <= endStr));
-            if (marketData.length < 5) return;
-            const params = { seed: parseFloat(document.getElementById('seed').value), fee: parseFloat(document.getElementById('fee').value) / 100, N: parseInt(document.getElementById('divN').value), BuyP: parseFloat(document.getElementById('paramBuyP').value), SellP: parseFloat(document.getElementById('paramSellP').value), D: parseInt(document.getElementById('maxD').value) };
-            const res = runSimulation(params, marketData, cachedData);
-            displayBacktestResults(res, params);
-        }
-
-        function displayBacktestResults(res, params) {
-            document.getElementById('statsSection').classList.remove('hidden');
-            document.getElementById('annualSection').classList.remove('hidden');
-            document.getElementById('heatmapSection').classList.remove('hidden');
-            document.getElementById('statFinal').innerText = '$' + res.finalVal.toLocaleString(undefined, {maximumFractionDigits:0});
-            document.getElementById('statReturn').innerText = `${res.totalRet.toFixed(0)}%`;
-            document.getElementById('statCAGR').innerText = `${res.cagr.toFixed(2)}%`;
-            // 백테스트 패널 MDD 마이너스 표시
-            document.getElementById('statMDD').innerText = `-${res.mdd.toFixed(2)}%`;
-            document.getElementById('statWinRate').innerText = `${res.winRate.toFixed(1)}%`;
-            document.getElementById('statPF').innerText = res.pf.toFixed(2);
-            document.getElementById('statPain').innerText = res.painIndex.toFixed(2);
-            document.getElementById('statGPR').innerText = res.gpr.toFixed(2);
-            document.getElementById('statCalmar').innerText = res.calmar.toFixed(2);
-            const annualBody = document.getElementById('annualBody'), heatmapBody = document.getElementById('heatmapBody');
-            let years = {}, monthlyMap = {}; 
-            res.dailyLogs.forEach((log) => {
-                const year = log.date.substring(0, 4), month = parseInt(log.date.substring(5, 7));
-                if (!years[year]) { years[year] = { startEquity: 0, endEquity: 0, realizedSum: 0, peak: 0, maxDD: 0 }; }
-                years[year].endEquity = log.equity; years[year].realizedSum += log.realized;
-                if (log.equity > years[year].peak) years[year].peak = log.equity;
-                const currentDD = ((years[year].peak - log.equity) / years[year].peak) * 100;
-                if (currentDD > years[year].maxDD) years[year].maxDD = currentDD;
-                if (!monthlyMap[year]) monthlyMap[year] = {}; monthlyMap[year][month] = log.equity;
-            });
-            const sortedYears = Object.keys(years).sort(); let prevEndEquity = params.seed; 
-            annualBody.innerHTML = sortedYears.map(year => {
-                const y = years[year], startEq = prevEndEquity, ret = ((y.endEquity - startEq) / startEq) * 100;
-                // 연도별 성과 분석 MDD 마이너스 표시
-                const html = `<tr><td class="px-4 py-1.5 font-bold text-slate-900 text-center text-center">${year}</td><td class="px-4 py-1.5 text-center text-xs text-center">$${startEq.toLocaleString(undefined, {maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-semibold text-center text-xs text-center text-center">$${y.endEquity.toLocaleString(undefined, {maximumFractionDigits:0})}</td><td class="px-4 py-1.5 font-bold ${ret >= 0 ? 'text-red-600' : 'text-blue-600'} text-center text-center text-center">${ret >= 0 ? '+' : ''}${ret.toFixed(2)}%</td><td class="px-4 py-1.5 text-blue-500 font-bold text-center text-center">-${y.maxDD.toFixed(2)}%</td><td class="px-4 py-1.5 font-bold text-xs text-center text-center text-center">$${y.realizedSum.toLocaleString(undefined, {maximumFractionDigits:0})}</td></tr>`;
-                prevEndEquity = y.endEquity; return html;
-            }).join('');
-            let heatmapHtml = "", rollingPrevEquity = params.seed;
-            sortedYears.forEach(year => {
-                let rowHtml = `<tr class="border-b border-slate-50 text-center"><td class="bg-slate-50 font-black text-slate-900 text-[11px] text-center">${year}</td>`;
-                let yearStartEq = rollingPrevEquity;
-                for (let m = 1; m <= 12; m++) {
-                    const monthEndEq = monthlyMap[year][m];
-                    if (monthEndEq) {
-                        const mRet = ((monthEndEq - rollingPrevEquity) / rollingPrevEquity) * 100;
-                        let bgColor = "transparent", textColor = "#1e293b";
-                        if (mRet > 0) { const intensity = Math.min(mRet / 10, 1), opacity = 0.1 + (intensity * 0.85); bgColor = `rgba(239, 68, 68, ${opacity.toFixed(2)})`; textColor = opacity > 0.5 ? "white" : "#7f1d1d"; }
-                        else if (mRet < 0) { const intensity = Math.min(Math.abs(mRet) / 10, 1), opacity = 0.1 + (intensity * 0.85); bgColor = `rgba(16, 185, 129, ${opacity.toFixed(2)})`; textColor = opacity > 0.5 ? "white" : "#064e3b"; }
-                        else { textColor = "#94a3b8"; }
-                        rowHtml += `<td style="background-color: ${bgColor}; color: ${textColor};" class="text-center">${mRet >= 0 ? '+' : ''}${mRet.toFixed(1)}%</td>`; rollingPrevEquity = monthEndEq;
-                    } else { rowHtml += `<td class="text-slate-200 font-normal text-center">-</td>`; }
-                }
-                const annualRet = ((years[year].endEquity - yearStartEq) / yearStartEq) * 100;
-                rowHtml += `<td class="bg-slate-50 font-black text-center ${annualRet >= 0 ? 'text-red-600' : 'text-blue-600'} text-center">${annualRet >= 0 ? '+' : ''}${annualRet.toFixed(1)}%</td></tr>`; heatmapHtml += rowHtml;
-            });
-            heatmapBody.innerHTML = heatmapHtml;
-            if (equityChart) equityChart.destroy();
-            equityChart = new Chart(document.getElementById('equityChart').getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: res.labels,
-                    datasets: [
-                        { label: 'MDD (%)', data: res.strategyDrawdowns, fill: true, backgroundColor: 'rgba(239, 68, 68, 0.15)', borderColor: 'rgba(239, 68, 68, 0.4)', borderWidth: 1, pointRadius: 0, yAxisID: 'yMDD', tension: 0.1 },
-                        { label: 'SOXL 종가', data: res.prices, borderColor: 'rgba(148, 163, 184, 0.3)', borderWidth: 1.5, pointRadius: 0, yAxisID: 'yL', tension: 0.1 },
-                        { label: '전략 자산', data: res.history, borderColor: '#2563eb', borderWidth: 2.5, pointRadius: 0, yAxisID: 'yR', tension: 0.1 }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-                    plugins: { legend: { display: true, position: 'top', labels: { font: { weight: 'bold', size: 11 } } }, tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', padding: 12 } },
-                    scales: {
-                        x: { ticks: { maxTicksLimit: 12, font: { size: 10 } }, grid: { display: false } },
-                        yL: { type: 'linear', position: 'left', title: { display: true, text: 'Price ($)', font: { size: 10, weight: 'bold' } }, ticks: { font: { size: 9 } } },
-                        yR: { type: 'linear', position: 'right', title: { display: true, text: 'Equity ($)', font: { size: 10, weight: 'bold' } }, ticks: { font: { size: 9 } }, grid: { drawOnChartArea: false } },
-                        yMDD: { type: 'linear', position: 'right', min: -100, max: 0, display: true, title: { display: true, text: 'Drawdown (%)', font: { size: 10, weight: 'bold' }, color: '#ef4444' }, ticks: { font: { size: 8 }, color: '#ef4444' }, grid: { display: false } }
-                    }
-                }
-            });
-            const logBody = document.getElementById('tradeLog');
-            logBody.innerHTML = res.dailyLogs.map(l => {
-                const isLossSell = l.event.includes('손절') || l.event.includes('손실'), isProfitSell = l.event.includes('익절'), isBuy = l.event.includes('매수');
-                let eventClass = "text-slate-400"; if (isProfitSell) eventClass = "bg-red-600 text-white px-2 py-0.5 rounded font-black";
-                else if (isLossSell) eventClass = "bg-blue-600 text-white px-2 py-0.5 rounded font-black";
-                else if (isBuy) eventClass = "bg-slate-700 text-white px-2 py-0.5 rounded font-black";
-                return `<tr class="hover:bg-slate-50 border-b text-center"><td class="px-3 py-2 font-mono text-left text-xs">${l.date}</td><td class="px-3 py-2 text-right font-mono text-xs text-right">$${l.rawClose}</td><td class="px-3 py-2 text-right ${l.change>=0?'text-red-600':'text-blue-600'} font-bold text-xs text-right">${l.change.toFixed(2)}%</td><td class="px-3 py-2 text-right text-slate-600 font-bold text-xs text-center">${l.bought||'-'}</td><td class="px-3 py-2 text-center font-bold text-xs text-center">${l.port}</td><td class="px-3 py-2 text-right font-bold text-slate-800 text-xs text-right">$${l.equity.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td class="px-3 py-2 text-right font-black ${l.realized>0?'text-red-600':l.realized<0?'text-blue-600':''} text-center text-xs text-center">${l.realized?l.realized.toLocaleString(undefined,{maximumFractionDigits:0}):'-'}</td><td class="px-3 py-2 text-center text-center text-center"><span class="text-[9px] uppercase ${eventClass} text-center text-center text-center">${l.event}</span></td><td class="px-3 py-2 text-right font-bold text-red-400 bg-red-50/20 text-xs text-right text-right">${l.dd > 0 ? '-' : ''}${l.dd.toFixed(2)}%</td></tr>`;
-            }).join('');
-            document.getElementById('logCount').innerText = `${res.dailyLogs.length} 거래일 기록 완료`;
-        }
-
-        async function runOptimizer() {
-            if (!cachedData) return;
-            if (window.saveAllInputs) window.saveAllInputs();
-            const startStr = document.getElementById('optStartDate').value, endStr = document.getElementById('optEndDate').value;
-            const marketData = cachedData.filter(item => (!startStr || item.dateStr >= startStr) && (!endStr || item.dateStr <= endStr));
-            if (marketData.length < 5) { alert("기간 내 데이터 부족"); return; }
-            const totalIter = parseInt(document.getElementById('optIter').value), seed = parseFloat(document.getElementById('seed').value), fee = parseFloat(document.getElementById('fee').value) / 100;
-            const filters = { cagr: parseFloat(document.getElementById('filterCAGR').value), mdd: parseFloat(document.getElementById('filterMDD').value), calmar: parseFloat(document.getElementById('filterCalmar').value), pain: parseFloat(document.getElementById('filterPain').value) };
-            const ranges = { n: [parseInt(document.getElementById('optNMin').value), parseInt(document.getElementById('optNMax').value)], buy: [parseFloat(document.getElementById('optBuyMin').value), parseFloat(document.getElementById('optBuyMax').value)], sell: [parseFloat(document.getElementById('optSellMin').value), parseFloat(document.getElementById('optSellMax').value)], d: [parseInt(document.getElementById('optDMin').value), parseInt(document.getElementById('optDMax').value)] };
-            
-            const nCount = ranges.n[1] - ranges.n[0] + 1;
-            const buyCount = Math.round((ranges.buy[1] - ranges.buy[0]) * 10) + 1;
-            const sellCount = Math.round((ranges.sell[1] - ranges.sell[0]) * 10) + 1;
-            const dCount = ranges.d[1] - ranges.d[0] + 1;
-            const totalCombinations = nCount * buyCount * sellCount * dCount;
-
-            const btn = document.getElementById('btnRunOptimizer'), progressSection = document.getElementById('optProgressSection'), progressBar = document.getElementById('optProgressBar'), progressText = document.getElementById('optProgressText'), progressDetail = document.getElementById('optProgressDetail');
-            btn.disabled = true; progressSection.classList.remove('hidden'); optimizationResults = []; const CHUNK_SIZE = 50;
-            
-            for (let i = 0; i < totalIter; i += CHUNK_SIZE) {
-                const currentEnd = Math.min(i + CHUNK_SIZE, totalIter), percent = Math.round((currentEnd / totalIter) * 100);
-                progressBar.style.width = `${percent}%`; progressText.innerText = `연산 진행률: ${percent}%`;
-                progressDetail.innerText = `${currentEnd} / ${totalIter} (총조합수: ${totalCombinations.toLocaleString()})`;
-                
-                await new Promise(resolve => setTimeout(resolve, 0));
-                for (let j = i; j < currentEnd; j++) {
-                    const N = Math.floor(Math.random() * (ranges.n[1] - ranges.n[0] + 1)) + ranges.n[0];
-                    const BuyP = parseFloat((Math.floor(Math.random() * ((ranges.buy[1] - ranges.buy[0]) * 10 + 1)) / 10 + ranges.buy[0]).toFixed(1));
-                    const SellP = parseFloat((Math.floor(Math.random() * ((ranges.sell[1] - ranges.sell[0]) * 10 + 1)) / 10 + ranges.sell[0]).toFixed(1));
-                    const D = Math.floor(Math.random() * (ranges.d[1] - ranges.d[0] + 1)) + ranges.d[0];
-                    const params = { seed, fee, N, BuyP, SellP, D };
-                    const res = runSimulation(params, marketData, cachedData);
-                    if (res.cagr >= filters.cagr && res.mdd <= filters.mdd && res.calmar >= filters.calmar && res.painIndex <= filters.pain) { optimizationResults.push({ ...params, ...res, startDate: startStr, endDate: endStr }); }
+                const res = runSimulation({ seed, fee, N, BuyP, SellP, D }, marketData, cachedData);
+                if (res.cagr >= filters.cagr && res.mdd <= filters.mdd && res.calmar >= filters.calmar && res.painIndex <= filters.pain) {
+                    optimizationResults.push({ seed, fee, N, BuyP, SellP, D, ...res, startDate: startStr, endDate: endStr });
                 }
             }
-            renderOptimizeTable(); document.getElementById('optStatus').innerText = `(${optimizationResults.length}개 발견)`; btn.disabled = false;
         }
 
-        function renderOptimizeTable() {
-            const criteria1 = document.getElementById('optSortCriteria').value, criteria2 = document.getElementById('optSortCriteria2').value, optBody = document.getElementById('optBody');
-            const getCompareFunc = (criteria) => (a, b) => {
-                if (criteria === 'pf') return b.pf - a.pf; if (criteria === 'cagr') return b.cagr - a.cagr;
-                if (criteria === 'gpr') return b.gpr - a.gpr; if (criteria === 'mdd') return a.mdd - b.mdd;
-                if (criteria === 'pain') return a.painIndex - b.painIndex; if (criteria === 'calmar') return b.calmar - a.calmar;
-                return 0;
-            };
-            optimizationResults.sort(getCompareFunc(criteria1));
-            let finalSelection = optimizationResults.slice(0, 30); if (criteria2 !== 'none') { finalSelection.sort(getCompareFunc(criteria2)); }
-            
-            const headerMap = { cagr: 5, mdd: 6, gpr: 7, calmar: 8, pain: 9, pf: 10 };
-            const ths = document.querySelectorAll('#tabOptimize table thead th');
-            ths.forEach(th => th.classList.remove('bg-slate-700', 'text-yellow-400'));
-            if (headerMap[criteria1]) {
-                ths[headerMap[criteria1]].classList.add('bg-slate-700', 'text-yellow-400');
-            }
+        renderOptimizeTable();
+        document.getElementById('optStatus').innerText = `(${optimizationResults.length}개 발견)`;
+        btn.disabled = false;
+    };
 
-            if (optimizationResults.length === 0) { optBody.innerHTML = `<tr><td colspan="12" class="py-20 text-red-400 italic font-bold text-center">조건을 만족하는 결과가 없습니다.</td></tr>`; return; }
-            
-            optBody.innerHTML = finalSelection.map((r, idx) => {
-                // [수정] 저장을 위해 결과 요소를 제외하고 딱 설정값만 포함
-                const essentialParams = { N: r.N, BuyP: r.BuyP, SellP: r.SellP, D: r.D, startDate: r.startDate, endDate: r.endDate };
-                const paramStr = JSON.stringify(essentialParams).replace(/"/g, '&quot;');
-                const getCellClass = (c) => criteria1 === c ? 'bg-blue-50 font-black border-x border-blue-100' : '';
-                
-                return `
-                <tr class="clickable-row border-b text-center text-center text-center">
-                    <td class="px-4 py-3 font-bold" onclick="window.applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})">${idx + 1}</td>
-                    <td class="px-2 py-3 font-semibold text-center text-center text-center text-center">${r.N}</td>
-                    <td class="px-2 py-3 text-red-600 font-bold text-center text-center text-center text-center">${r.BuyP}%</td>
-                    <td class="px-2 py-3 text-blue-600 font-bold text-center text-center text-center text-center text-center">${r.SellP}%</td>
-                    <td class="px-2 py-3 font-semibold text-center text-center text-center text-center text-center">${r.D}</td>
-                    <td class="px-4 py-3 font-black text-red-600 text-center text-center text-center text-center ${getCellClass('cagr')}">${r.cagr.toFixed(1)}%</td>
-                    <td class="px-4 py-3 font-bold text-blue-500 text-center text-center text-center text-center text-center text-center ${getCellClass('mdd')}">-${r.mdd.toFixed(1)}%</td>
-                    <td class="px-4 py-3 font-medium text-slate-700 text-center text-center text-center text-center text-center text-center ${getCellClass('gpr')}">${r.gpr.toFixed(2)}</td>
-                    <td class="px-4 py-3 font-medium text-purple-600 text-center text-center text-center text-center text-center text-center text-center ${getCellClass('calmar')}">${r.calmar.toFixed(2)}</td>
-                    <td class="px-4 py-3 text-slate-400 text-center text-center text-center text-center text-center text-center text-center text-center ${getCellClass('pain')}">${r.painIndex.toFixed(2)}</td>
-                    <td class="px-4 py-3 font-black text-red-700 text-center text-center text-center text-center text-center text-center text-center text-center ${getCellClass('pf')}">${r.pf.toFixed(2)}</td>
-                    <td class="px-4 py-2 flex items-center justify-center gap-1.5 text-center text-center text-center text-center text-center text-center text-center text-center text-center text-center">
-                        <button onclick="window.applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D})" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center text-center text-center text-center text-center">적용</button>
-                        <button onclick="window.openPresetModal(${paramStr})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90 text-center text-center text-center text-center text-center" title="프리셋으로 저장">★</button>
-                    </td>
-                </tr>`}).join('');
+    function renderOptimizeTable() {
+        const criteria1 = document.getElementById('optSortCriteria').value;
+        const criteria2 = document.getElementById('optSortCriteria2').value;
+        const optBody   = document.getElementById('optBody');
+
+        const getCompareFunc = c => (a, b) => {
+            if (c === 'pf')     return b.pf         - a.pf;
+            if (c === 'cagr')   return b.cagr        - a.cagr;
+            if (c === 'gpr')    return b.gpr         - a.gpr;
+            if (c === 'mdd')    return a.mdd         - b.mdd;
+            if (c === 'pain')   return a.painIndex   - b.painIndex;
+            if (c === 'calmar') return b.calmar      - a.calmar;
+            return 0;
+        };
+
+        optimizationResults.sort(getCompareFunc(criteria1));
+        let finalSelection = optimizationResults.slice(0, 30);
+        if (criteria2 !== 'none') finalSelection.sort(getCompareFunc(criteria2));
+
+        // 헤더 하이라이트
+        const headerMap = { cagr: 5, mdd: 6, gpr: 7, calmar: 8, pain: 9, pf: 10 };
+        document.querySelectorAll('#tabOptimize table thead th').forEach(th => th.classList.remove('bg-slate-700', 'text-yellow-400'));
+        if (headerMap[criteria1] !== undefined) {
+            document.querySelectorAll('#tabOptimize table thead th')[headerMap[criteria1]].classList.add('bg-slate-700', 'text-yellow-400');
         }
 
-        window.clearBacktestResults = function() {
-            document.getElementById('statsSection').classList.add('hidden');
-            document.getElementById('annualSection').classList.add('hidden');
-            document.getElementById('heatmapSection').classList.add('hidden');
-            if (equityChart) {
-                equityChart.destroy();
-                equityChart = null;
-            }
-            document.getElementById('tradeLog').innerHTML = "";
-            document.getElementById('logCount').innerText = "Ready";
+        if (optimizationResults.length === 0) {
+            optBody.innerHTML = `<tr><td colspan="12" class="py-20 text-red-400 italic font-bold text-center">조건을 만족하는 결과가 없습니다.</td></tr>`;
+            return;
         }
 
-        window.applyParams = function(n, buy, sell, d) {
-            document.getElementById('divN').value = n; 
-            document.getElementById('paramBuyP').value = buy;
-            document.getElementById('paramSellP').value = sell; 
-            document.getElementById('maxD').value = d;
-            document.getElementById('startDate').value = document.getElementById('optStartDate').value;
-            document.getElementById('endDate').value = document.getElementById('optEndDate').value;
-            
-            window.clearBacktestResults();
-            window.switchTab('backtest');
-        }
+        optBody.innerHTML = finalSelection.map((r, idx) => {
+            const getCellClass = c => criteria1 === c ? 'bg-blue-50 font-black border-x border-blue-100' : '';
+            // JSON.stringify 없이 개별 속성을 직접 인수로 전달 (특수문자 이스케이프 문제 방지)
+            return `<tr class="clickable-row border-b text-center">
+                <td class="px-4 py-3 font-bold">${idx + 1}</td>
+                <td class="px-2 py-3 font-semibold">${r.N}</td>
+                <td class="px-2 py-3 text-red-600 font-bold">${r.BuyP}%</td>
+                <td class="px-2 py-3 text-blue-600 font-bold">${r.SellP}%</td>
+                <td class="px-2 py-3 font-semibold">${r.D}</td>
+                <td class="px-4 py-3 font-black text-red-600 ${getCellClass('cagr')}">${r.cagr.toFixed(1)}%</td>
+                <td class="px-4 py-3 font-bold text-blue-500 ${getCellClass('mdd')}">-${r.mdd.toFixed(1)}%</td>
+                <td class="px-4 py-3 font-medium text-slate-700 ${getCellClass('gpr')}">${r.gpr.toFixed(2)}</td>
+                <td class="px-4 py-3 font-medium text-purple-600 ${getCellClass('calmar')}">${r.calmar.toFixed(2)}</td>
+                <td class="px-4 py-3 text-slate-400 ${getCellClass('pain')}">${r.painIndex.toFixed(2)}</td>
+                <td class="px-4 py-3 font-black text-red-700 ${getCellClass('pf')}">${r.pf.toFixed(2)}</td>
+                <td class="px-4 py-2">
+                    <div class="flex items-center justify-center gap-1.5">
+                        <button
+                            onclick="window.applyParams(${r.N}, ${r.BuyP}, ${r.SellP}, ${r.D}, '${r.startDate}', '${r.endDate}')"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90">
+                            적용
+                        </button>
+                        <button
+                            onclick="window.openPresetModal({N:${r.N},BuyP:${r.BuyP},SellP:${r.SellP},D:${r.D},startDate:'${r.startDate}',endDate:'${r.endDate}'})"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[9px] font-bold shadow-sm active:scale-90"
+                            title="프리셋으로 저장">★
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    window.clearBacktestResults = function() {
+        document.getElementById('statsSection').classList.add('hidden');
+        document.getElementById('annualSection').classList.add('hidden');
+        document.getElementById('heatmapSection').classList.add('hidden');
+        if (equityChart) { equityChart.destroy(); equityChart = null; }
+        document.getElementById('tradeLog').innerHTML = '';
+        document.getElementById('logCount').innerText = 'Ready';
+    };
+
+    // =====================================================================
+    // ★ applyParams: startDate, endDate 인수 추가 (최적화 기간 반영)
+    // =====================================================================
+    window.applyParams = function(n, buy, sell, d, startDate, endDate) {
+        document.getElementById('divN').value       = n;
+        document.getElementById('paramBuyP').value  = buy;
+        document.getElementById('paramSellP').value = sell;
+        document.getElementById('maxD').value        = d;
+        if (startDate) document.getElementById('startDate').value = startDate;
+        if (endDate)   document.getElementById('endDate').value   = endDate;
+        window.clearBacktestResults();
+        window.switchTab('backtest');
+    };
     </script>
 </body>
 </html>
